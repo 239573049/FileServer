@@ -12,6 +12,15 @@ builder.Services.AddMvcCore(options =>
     options.Filters.Add<ResultFilter>();
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", corsBuilder =>
+    {
+        corsBuilder.SetIsOriginAllowed((string _) => true).AllowAnyMethod().AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 builder.Services.AddFileApplication();
 
 var app = builder.Build();
@@ -41,6 +50,7 @@ app.MapGet("/api/file/list", (IFileService fileService, string? name, string? pa
 app.MapGet("/api/file/content", (IFileService fileService, string filePath)
     => fileService.GetFileContentAsync(filePath));
 
+app.UseCors("CorsPolicy");
 
 await app.RunAsync();
 

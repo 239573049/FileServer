@@ -19,7 +19,7 @@ namespace File.Application.Contract.Files.Input
             Page = page ?? 1;
             PageSize = pageSize ?? 20;
             Name = name ?? string.Empty;
-            Path = path ?? "/";
+            Path = string.IsNullOrEmpty(path) ? "/" : path;
         }
     }
 }

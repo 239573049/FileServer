@@ -1,14 +1,16 @@
 import { GetListInput } from '@/module/getListInput';
 import request from '@/utils/request';
 
-const name = 'api/file';
+const name = '/api/file';
 
 class fileApi {
   /**
    * 获取文件列表
    */
   getList(input: GetListInput) {
-    return request.get(name + '/list', input);
+    return request.get(name + '/list', {
+      params: input
+    });
   }
 
   /**

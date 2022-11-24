@@ -4,6 +4,10 @@ import { Component, ReactNode } from 'react';
 import fileApi from '../../apis/fileApi';
 import { Input, List, Upload, message } from 'antd';
 import './index.less'
+import { InboxOutlined } from '@ant-design/icons';
+import { UploadProps, Button } from 'antd';
+
+const { Dragger } = Upload;
 
 const { Search } = Input;
 import {
@@ -44,6 +48,13 @@ class File extends Component<IProps, IState> {
         <span className='fileName'>
           {item.name}
         </span>
+        <span>
+          {item.type === FileType.Directory ?
+            <Button>
+              下载
+            </Button> : <div>
+            </div>}
+        </span>
       </div>)
   }
 
@@ -72,24 +83,30 @@ class File extends Component<IProps, IState> {
 
   }
 
+  beforeUpload(file: any[]) {
+    console.log(file);
+
+    return false;
+  }
+
   render(): ReactNode {
     var { data, input } = this.state;
     return (<div>
-
-      <div>
-        <Search onSearch={() => this.getListData()} style={{ width: "70%" }} value={input.path} onChange={(value) => {
-          input.path = value.target.value
-          this.setState({ input })
-        }} enterButton />
-      </div>
-      <div>
-        <List
-          itemLayout="horizontal"
-          dataSource={data.items}
-
-          renderItem={(item: FilesListDto) => this.getList(item)}>
-        </List>
-      </div>
+      <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
+        <div style={{ marginBottom: "10px" }}>
+          <Search onSearch={() => this.getListData()} style={{ width: "70%" }} value={input.path} onChange={(value) => {
+            input.path = value.target.value
+            this.setState({ input })
+          }} enterButton />
+        </div>
+        <div>
+          <List
+            itemLayout="horizontal"
+            dataSource={data.items}
+            renderItem={(item: FilesListDto) => this.getList(item)}>
+          </List>
+        </div>
+      </Dragger>
     </div>);
   }
 }

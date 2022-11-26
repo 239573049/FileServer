@@ -1,4 +1,5 @@
 import { GetListInput } from '@/module/getListInput';
+import { SaveFileContentInput } from '@/module/saveFileContentInput';
 import request from '@/utils/request';
 
 const name = '/api/file';
@@ -18,6 +19,17 @@ class fileApi {
    */
   getFileContent(filePath: string) {
     return request.get(name + '/content?filePath=' + filePath);
+  }
+
+  /**
+   * 保存文件
+   * @param input 
+   * @returns 
+   */
+  saveFileContent(input: SaveFileContentInput) {
+    return request.post(name + '/save', {
+      data: input
+    })
   }
 }
 export default new fileApi();

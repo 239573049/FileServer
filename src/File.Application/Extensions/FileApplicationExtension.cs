@@ -9,7 +9,8 @@ public static class FileApplicationExtension
     public static void AddFileApplication(this IServiceCollection services)
     {
         services.AddTransient<IFileService, FileService>();
-    }
 
+        MessagePack.MessagePackSerializer.DefaultOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options;
+    }
 
 }

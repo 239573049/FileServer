@@ -2,6 +2,7 @@
 using File.Application.Contract.Files;
 using File.Application.Contract.Files.Dto;
 using File.Application.Contract.Files.Input;
+using System.Text;
 
 namespace File.Application.Files;
 
@@ -47,14 +48,20 @@ public class FileService : IFileService
     /// <inheritdoc />
     public async Task<string> GetFileContentAsync(string filePath)
     {
-        if (System.IO.File.Exists(filePath))
+        if (!System.IO.File.Exists(filePath))
         {
             throw new BusinessException("文件不存在");
         }
 
-        try 
+        try
         {
             await using var file = System.IO.File.OpenRead(filePath);
+
+            if (file.Length > (1024 * 1024) * 4)
+            {
+                throw new BusinessException("文件大于4MB无法读取");
+            }
+
             using var str = new StreamReader(file);
 
             return await str.ReadToEndAsync();
@@ -63,6 +70,29 @@ public class FileService : IFileService
         catch (Exception exception)
         {
             throw new BusinessException("读取文件错误", exception);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task SaveFileContentAsync(SaveFileContentInput input)
+    {
+        if (!System.IO.File.Exists(input.FilePath))
+        {
+            throw new BusinessException("文件不存在");
+        }
+
+        try
+        {
+            using var fileStream = System.IO.File.OpenWrite(input.FilePath);
+            fileStream.Position = 0;
+            await fileStream.WriteAsync(Encoding.UTF8.GetBytes(input.Content));
+            await fileStream.FlushAsync();
+            fileStream.Close();
+        }
+        catch (Exception)
+        {
+
+            throw;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace File.Application.Contract.Files
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        Task<string> GetFileContentAsync(string filePath);
+        Task<FileContentDto> GetFileContentAsync(string filePath);
 
         /// <summary>
         /// 保存文件

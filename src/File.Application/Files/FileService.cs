@@ -11,42 +11,49 @@ public class FileService : IFileService
     /// <inheritdoc />
     public Task<PagedResultDto<FilesListDto>> GetListAsync(GetListInput input)
     {
-        var list = new List<FilesListDto>();
-        var directories = Directory.GetDirectories(input.Path, input.Name);
-        foreach (var directory in directories)
+        try
         {
-            var directoryInfo = new DirectoryInfo(directory);
-            list.Add(new FilesListDto()
+            var list = new List<FilesListDto>();
+            var directories = Directory.GetDirectories(input.Path, input.Name);
+            foreach (var directory in directories)
             {
-                Name = directoryInfo.Name,
-                CreatedTime = directoryInfo.CreationTime,
-                Type = FileType.Directory,
-                FullName = directoryInfo.FullName,
-                UpdateTime = directoryInfo.LastWriteTime,
-            });
-        }
+                var directoryInfo = new DirectoryInfo(directory);
+                list.Add(new FilesListDto()
+                {
+                    Name = directoryInfo.Name,
+                    CreatedTime = directoryInfo.CreationTime,
+                    Type = FileType.Directory,
+                    FullName = directoryInfo.FullName.Replace("\\", "/"),
+                    UpdateTime = directoryInfo.LastWriteTime,
+                });
+            }
 
-        var files = Directory.GetFiles(input.Path, input.Name);
-        foreach (var file in files)
+            var files = Directory.GetFiles(input.Path, input.Name);
+            foreach (var file in files)
+            {
+                var fileInfo = new FileInfo(file);
+                list.Add(new FilesListDto()
+                {
+                    Name = fileInfo.Name,
+                    CreatedTime = fileInfo.CreationTime,
+                    FileType = "文件",
+                    Length = fileInfo.Length,
+                    FullName = fileInfo.FullName.Replace("\\","/"),
+                    Type = FileType.File,
+                    UpdateTime = fileInfo.LastWriteTime,
+                });
+            }
+
+            return Task.FromResult(new PagedResultDto<FilesListDto>(list.Count, list));
+        }
+        catch (Exception ex)
         {
-            var fileInfo = new FileInfo(file);
-            list.Add(new FilesListDto()
-            {
-                Name = fileInfo.Name,
-                CreatedTime = fileInfo.CreationTime,
-                FileType = "文件",
-                Length = fileInfo.Length,
-                FullName = fileInfo.FullName,
-                Type = FileType.File,
-                UpdateTime = fileInfo.LastWriteTime,
-            });
+            throw new BusinessException(ex.Message);
         }
-
-        return Task.FromResult(new PagedResultDto<FilesListDto>(list.Count, list));
     }
 
     /// <inheritdoc />
-    public async Task<string> GetFileContentAsync(string filePath)
+    public async Task<FileContentDto> GetFileContentAsync(string filePath)
     {
         if (!System.IO.File.Exists(filePath))
         {
@@ -63,8 +70,8 @@ public class FileService : IFileService
             }
 
             using var str = new StreamReader(file);
-
-            return await str.ReadToEndAsync();
+            return new FileContentDto(await str.ReadToEndAsync(),file.Name);
+            
 
         }
         catch (Exception exception)

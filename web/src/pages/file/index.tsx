@@ -5,16 +5,22 @@ import fileApi from '../../apis/fileApi';
 import { Input, List, Upload, message } from 'antd';
 import './index.less'
 import { Modal, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
-const { Dragger } = Upload;
+import Editor from "@monaco-editor/react";
 
-const { Search, TextArea } = Input;
 import {
   FolderOpenOutlined,
   FileOutlined
 } from '@ant-design/icons';
 import { GetListInput } from '@/module/getListInput';
 import { SaveFileContentInput } from '@/module/saveFileContentInput';
+import { FileContentDto } from '@/module/fileContentDto';
+
+const { Dragger } = Upload;
+
+const { Search } = Input;
+
 interface IProps { }
 
 interface IState {
@@ -22,7 +28,13 @@ interface IState {
   data: PagedResultDto<FilesListDto>;
   input: GetListInput,
   file: FilesListDto | null,
-  fileContent: SaveFileContentInput
+  fileContent: SaveFileContentInput,
+  edit: {
+    language: string
+  }
+  options: {
+    selectOnLineNumbers: boolean
+  }
 }
 
 class File extends Component<IProps, IState> {
@@ -42,6 +54,12 @@ class File extends Component<IProps, IState> {
     fileContent: {
       filePath: '',
       content: ''
+    },
+    options: {
+      selectOnLineNumbers: true
+    },
+    edit: {
+      language: ''
     }
   };
 
@@ -51,14 +69,16 @@ class File extends Component<IProps, IState> {
   }
 
   onOpenClick(item: FilesListDto) {
-    var { fileContent } = this.state;
+    var { edit, fileContent } = this.state;
 
     fileApi.getFileContent(item.fullName!)
-      .then((res) => {
-        fileContent.content = res;
+      .then((res: FileContentDto) => {
+        fileContent.content = res.content;
+        edit.language = res.language
         fileContent.filePath = item.fullName!;
         this.setState({
-          fileContent
+          fileContent,
+          edit
         })
       })
     this.setState({
@@ -103,7 +123,7 @@ class File extends Component<IProps, IState> {
       this.setState({ input })
       this.getListData();
     } else {
-
+      this.onOpenClick(item)
     }
   }
 
@@ -128,9 +148,35 @@ class File extends Component<IProps, IState> {
         }
       })
   }
+  editorDidMount(editor: any, monaco: any) {
+    console.log('editorDidMount', editor);
+    editor.focus();
+  }
+
+  goBack() {
+    var { input } = this.state
+    var path = input.path.replaceAll('\\', '/')
+    console.log('paths', path);
+    var paths = path.split('/')
+    path = ''
+    for (let i = 0; i < paths.length - 1; i++) {
+      if (i >= paths.length - 1) {
+        path += paths[i]
+      } else {
+        path += paths[i] + '/'
+      }
+    }
+    input.path = path
+    this.setState({
+      input
+    })
+
+    console.log(input);
+
+  }
 
   render(): ReactNode {
-    var { data, input, fileshow, file, fileContent } = this.state;
+    var { data, input, fileshow, file, fileContent, options, edit } = this.state;
     return (<div>
       <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
@@ -138,6 +184,7 @@ class File extends Component<IProps, IState> {
             input.path = value.target.value
             this.setState({ input })
           }} enterButton />
+          <Button onClick={() => this.goBack()} type="primary" disabled={input.path === '/'} icon={<ArrowLeftOutlined />} />
         </div>
         <div>
           <List
@@ -150,6 +197,7 @@ class File extends Component<IProps, IState> {
       <Modal
         title={file?.name}
         open={fileshow}
+        width="900px"
         onCancel={() => {
           this.setState({
             fileshow: false
@@ -170,15 +218,11 @@ class File extends Component<IProps, IState> {
           </div>
         ]}
       >
-        <TextArea
+        <Editor
+          height="600px"
+          width="800px"
+          language={edit.language}
           value={fileContent.content}
-          onChange={(e) => {
-            fileContent.content = e.target.value;
-            this.setState({
-              fileContent
-            })
-          }}
-          autoSize={{ minRows: 20, maxRows: 27, }}
         />
       </Modal>
     </div>);

@@ -4,26 +4,30 @@ import { Component, ReactNode } from 'react';
 import fileApi from '../../apis/fileApi';
 import { Input, List, Upload, message } from 'antd';
 import './index.less'
-import { InboxOutlined } from '@ant-design/icons';
-import { UploadProps, Button } from 'antd';
+import { Modal, Button } from 'antd';
 
 const { Dragger } = Upload;
 
-const { Search } = Input;
+const { Search, TextArea } = Input;
 import {
   FolderOpenOutlined,
   FileOutlined
 } from '@ant-design/icons';
 import { GetListInput } from '@/module/getListInput';
+import { SaveFileContentInput } from '@/module/saveFileContentInput';
 interface IProps { }
 
 interface IState {
+  fileshow: boolean,
   data: PagedResultDto<FilesListDto>;
-  input: GetListInput
+  input: GetListInput,
+  file: FilesListDto | null,
+  fileContent: SaveFileContentInput
 }
 
 class File extends Component<IProps, IState> {
   state: Readonly<IState> = {
+    fileshow: false,
     data: {
       items: [],
       totalCount: 0,
@@ -33,12 +37,34 @@ class File extends Component<IProps, IState> {
       page: 1,
       path: "/",
       pageSize: 20
+    },
+    file: null,
+    fileContent: {
+      filePath: '',
+      content: ''
     }
   };
 
   constructor(props: IProps) {
     super(props)
     this.getListData()
+  }
+
+  onOpenClick(item: FilesListDto) {
+    var { fileContent } = this.state;
+
+    fileApi.getFileContent(item.fullName!)
+      .then((res) => {
+        fileContent.content = res;
+        fileContent.filePath = item.fullName!;
+        this.setState({
+          fileContent
+        })
+      })
+    this.setState({
+      fileshow: true,
+      file: item
+    })
   }
 
   getList(item: FilesListDto) {
@@ -49,10 +75,13 @@ class File extends Component<IProps, IState> {
           {item.name}
         </span>
         <span>
-          {item.type === FileType.Directory ?
-            <Button>
-              下载
-            </Button> : <div>
+          {item.type === FileType.File ?
+            <span className="file-button" onClick={() => this.onOpenClick(item)}>
+              打开
+            </span>
+            :
+            <div>
+
             </div>}
         </span>
       </div>)
@@ -89,8 +118,19 @@ class File extends Component<IProps, IState> {
     return false;
   }
 
+  saveFileContent() {
+    var { fileContent } = this.state;
+
+    fileApi.saveFileContent(fileContent)
+      .then((res) => {
+        if (res) {
+          message.success('操作成功')
+        }
+      })
+  }
+
   render(): ReactNode {
-    var { data, input } = this.state;
+    var { data, input, fileshow, file, fileContent } = this.state;
     return (<div>
       <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
@@ -107,6 +147,40 @@ class File extends Component<IProps, IState> {
           </List>
         </div>
       </Dragger>
+      <Modal
+        title={file?.name}
+        open={fileshow}
+        onCancel={() => {
+          this.setState({
+            fileshow: false
+          })
+        }}
+        footer={[
+          <div>
+            <Button type="primary" onClick={() => this.saveFileContent()}>
+              保存
+            </Button>
+            <Button type="primary" danger onClick={() => {
+              this.setState({
+                fileshow: false
+              })
+            }}>
+              取消
+            </Button>
+          </div>
+        ]}
+      >
+        <TextArea
+          value={fileContent.content}
+          onChange={(e) => {
+            fileContent.content = e.target.value;
+            this.setState({
+              fileContent
+            })
+          }}
+          autoSize={{ minRows: 20, maxRows: 27, }}
+        />
+      </Modal>
     </div>);
   }
 }

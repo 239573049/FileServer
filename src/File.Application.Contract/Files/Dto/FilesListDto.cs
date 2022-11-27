@@ -40,7 +40,7 @@ namespace File.Application.Contract.Files.Dto
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime? CreatedTime { get; set; }
+        public string? CreatedTime { get; set; }
 
         public string? FullName { get; set; }
     }

@@ -2,9 +2,10 @@ import { FilesListDto, FileType } from '@/module/filesListDto';
 import { PagedResultDto } from '@/module/pagedResultDto';
 import { Component, ReactNode } from 'react';
 import fileApi from '../../apis/fileApi';
+import directoryApi from '../../apis/directoryApi'
 import { Input, List, Upload, message } from 'antd';
 import './index.less'
-import { Modal, Button } from 'antd';
+import { Modal, Button, Tooltip } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import Editor from "@monaco-editor/react";
@@ -16,6 +17,8 @@ import {
 import { GetListInput } from '@/module/getListInput';
 import { SaveFileContentInput } from '@/module/saveFileContentInput';
 import { FileContentDto } from '@/module/fileContentDto';
+import CreateDirectory from '@/components/directory/create';
+import CreateFile from '@/components/file/create';
 
 const { Dragger } = Upload;
 
@@ -34,6 +37,12 @@ interface IState {
   }
   options: {
     selectOnLineNumbers: boolean
+  },
+  createDirectory: {
+    open: boolean,
+  },
+  createFile: {
+    open: boolean
   }
 }
 
@@ -60,15 +69,28 @@ class File extends Component<IProps, IState> {
     },
     edit: {
       language: ''
+    },
+    createDirectory: {
+      open: false
+    },
+    createFile: {
+      open: false
     }
   };
 
   constructor(props: IProps) {
     super(props)
     this.getListData()
+    document.oncontextmenu = function (e) {
+      return false
+    }
   }
 
-  onOpenClick(item: FilesListDto) {
+  /**
+   * 打开文件
+   * @param item 
+   */
+  onOpenFile(item: FilesListDto) {
     var { edit, fileContent } = this.state;
 
     fileApi.getFileContent(item.fullName!)
@@ -87,24 +109,147 @@ class File extends Component<IProps, IState> {
     })
   }
 
+  /**
+   * 打开文件夹
+   * @param item 
+   */
+  onOpenDirectory(item: FilesListDto) {
+    if (item.type === FileType.Directory) {
+      var { input } = this.state
+      input.path = item.fullName ?? "/";
+      this.setState({
+        input
+      })
+      this.getListData();
+    }
+  }
+
+  onDeleteFile(item: FilesListDto) {
+    if (item.fullName) {
+      fileApi.deleteFile(item.fullName)
+        .then((res) => {
+          if (res != undefined) {
+            message.success("删除成功")
+            this.getListData()
+          }
+        })
+    }
+  }
+
+  /**
+   * 删除文件夹
+   * @param item 
+   */
+  deleteDirectory(item: FilesListDto) {
+    if (item.fullName) {
+      directoryApi.delete(item.fullName)
+        .then((res) => {
+          if (res != undefined) {
+            message.success("删除成功")
+            this.getListData()
+          }
+        })
+    }
+  }
+
+  /**
+   * 创建文件夹
+   */
+  createDirecotry() {
+    var { createDirectory } = this.state;
+    createDirectory.open = true;
+
+    this.setState({
+      createDirectory
+    })
+  }
+
+  /**
+   * 创建文件
+   */
+  createFile() {
+
+    var { createFile } = this.state;
+    createFile.open = true;
+
+    this.setState({
+      createFile
+    })
+  }
+
+  extractDirectory(item: FilesListDto) {
+    fileApi.extractToDirectory(this.state.input.path, item.name!)
+      .then(res => {
+        if (res != undefined) {
+          message.success("解压成功")
+          this.getListData()
+        }
+      })
+  }
+
+  /**
+   * 弹出操作栏
+   * @param item 
+   * @returns 
+   */
+  feature(item: FilesListDto) {
+    if (item.type === FileType.File) {
+
+      if (item.name?.endsWith(".zip")) {
+
+        return (
+          <span>
+            <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
+              删除
+            </div>
+            <div className="file-button" onClick={() => this.extractDirectory(item)}>
+              解压到当前路径
+            </div>
+          </span>)
+      }
+
+      return (
+        <span>
+          <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
+            删除
+          </div>
+          <div className="file-button" onClick={() => this.onOpenFile(item)}>
+            编辑
+          </div>
+        </span>)
+    } else {
+      return (
+        <div>
+          <div className='file-delete' onClick={() => this.deleteDirectory(item)}>
+            删除
+          </div>
+        </div>)
+    }
+
+  }
+
+
+
   getList(item: FilesListDto) {
     return (
-      <div id="box" className='fileList' onClick={() => this.onfileClick(item)}>
-        {item.type === FileType.Directory ? <FolderOpenOutlined /> : <FileOutlined />}
-        <span className='fileName'>
-          {item.name}
-        </span>
-        <span>
-          {item.type === FileType.File ?
-            <span className="file-button" onClick={() => this.onOpenClick(item)}>
-              打开
+      <Tooltip placement="topLeft" title={() => this.feature(item)} trigger='contextMenu'>
+        <div id="box" className='fileList' onDoubleClick={() => {
+          if (item.type === FileType.Directory) {
+            this.onOpenDirectory(item)
+          } else {
+            this.onOpenFile(item)
+          }
+        }}>
+          {item.type === FileType.Directory ? <FolderOpenOutlined /> : <FileOutlined />}
+          <span className='fileName'>
+            {item.name}
+            <span className='create-time'>
+              创建时间：{item.createdTime}
             </span>
-            :
-            <div>
-
-            </div>}
-        </span>
-      </div>)
+          </span>
+        </div>
+      </Tooltip>
+    )
   }
 
   getListData() {
@@ -114,17 +259,6 @@ class File extends Component<IProps, IState> {
           data: res
         })
       })
-  }
-
-  onfileClick(item: FilesListDto) {
-    if (item.type === FileType.Directory) {
-      var { input } = this.state;
-      input.path = item.fullName!;
-      this.setState({ input })
-      this.getListData();
-    } else {
-      this.onOpenClick(item)
-    }
   }
 
   onDrop(value: any) {
@@ -140,10 +274,9 @@ class File extends Component<IProps, IState> {
 
   saveFileContent() {
     var { fileContent } = this.state;
-
     fileApi.saveFileContent(fileContent)
       .then((res) => {
-        if (res) {
+        if (res != undefined) {
           message.success('操作成功')
         }
       })
@@ -156,11 +289,10 @@ class File extends Component<IProps, IState> {
   goBack() {
     var { input } = this.state
     var path = input.path.replaceAll('\\', '/')
-    console.log('paths', path);
     var paths = path.split('/')
     path = ''
     for (let i = 0; i < paths.length - 1; i++) {
-      if (i >= paths.length - 1) {
+      if (paths.length > 2 && i === paths.length - 2) {
         path += paths[i]
       } else {
         path += paths[i] + '/'
@@ -171,20 +303,25 @@ class File extends Component<IProps, IState> {
       input
     })
 
-    console.log(input);
-
+    this.getListData();
   }
 
   render(): ReactNode {
-    var { data, input, fileshow, file, fileContent, options, edit } = this.state;
+    var { data, input, fileshow, file, fileContent, options, edit, createDirectory, createFile } = this.state;
     return (<div>
       <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
-          <Search onSearch={() => this.getListData()} style={{ width: "70%" }} value={input.path} onChange={(value) => {
+          <Search onSearch={() => this.getListData()} style={{ width: "50%" }} value={input.path} onChange={(value) => {
             input.path = value.target.value
             this.setState({ input })
           }} enterButton />
           <Button onClick={() => this.goBack()} type="primary" disabled={input.path === '/'} icon={<ArrowLeftOutlined />} />
+          <Button onClick={() => this.createDirecotry()} type="primary" style={{ float: "right", marginLeft: '5px' }}>
+            添加文件夹
+          </Button>
+          <Button onClick={() => this.createFile()} type="primary" style={{ float: "right", marginLeft: '5px' }}>
+            添加文件
+          </Button>
         </div>
         <div>
           <List
@@ -222,9 +359,33 @@ class File extends Component<IProps, IState> {
           height="600px"
           width="800px"
           language={edit.language}
+          onChange={(value) => {
+            fileContent.content = value ?? "";
+            this.setState({
+              fileContent
+            })
+          }}
           value={fileContent.content}
         />
       </Modal>
+      <CreateDirectory input={input} isModalOpen={createDirectory.open} onCancel={(value: boolean) => {
+        createDirectory.open = false
+        if (value) {
+          this.getListData()
+        }
+        this.setState({
+          createDirectory
+        })
+      }} />
+      <CreateFile input={input} isModalOpen={createFile.open} onCancel={(value: boolean) => {
+        createFile.open = false
+        if (value) {
+          this.getListData()
+        }
+        this.setState({
+          createFile
+        })
+      }} />
     </div>);
   }
 }

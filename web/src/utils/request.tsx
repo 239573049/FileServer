@@ -2,6 +2,7 @@ import { extend } from 'umi-request';
 const baseUrl = 'http://localhost:5293';
 
 const errorHandler = (error: any) => {
+  console.log(error);
 };
 
 const request = extend({

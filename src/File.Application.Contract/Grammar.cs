@@ -9,7 +9,7 @@ public class Grammar
     static Grammar()
     {
         Language.Add(".md", "markdown");
-        Language.Add(".cs", "c#");
+        Language.Add(".cs", "csharp");
         Language.Add(".java", "java");
         Language.Add(".js", "javascript");
         Language.Add(".scss", "scss");
@@ -17,5 +17,8 @@ public class Grammar
         Language.Add(".json", "json");
         Language.Add(".bat", "bat");
         Language.Add("Dockerfile", "dockerfile");
+        Language.Add(".go", "go");
+        Language.Add(".xml", "xml");
+        Language.Add(".yml", "yml");
     }
 }

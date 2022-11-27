@@ -2,6 +2,7 @@
 using File.Application.Contract.Files;
 using File.Application.Contract.Files.Dto;
 using File.Application.Contract.Files.Input;
+using System.IO.Compression;
 using System.Text;
 
 namespace File.Application.Files;
@@ -21,7 +22,7 @@ public class FileService : IFileService
                 list.Add(new FilesListDto()
                 {
                     Name = directoryInfo.Name,
-                    CreatedTime = directoryInfo.CreationTime,
+                    CreatedTime = directoryInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     Type = FileType.Directory,
                     FullName = directoryInfo.FullName.Replace("\\", "/"),
                     UpdateTime = directoryInfo.LastWriteTime,
@@ -35,7 +36,7 @@ public class FileService : IFileService
                 list.Add(new FilesListDto()
                 {
                     Name = fileInfo.Name,
-                    CreatedTime = fileInfo.CreationTime,
+                    CreatedTime = fileInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     FileType = "文件",
                     Length = fileInfo.Length,
                     FullName = fileInfo.FullName.Replace("\\","/"),
@@ -101,5 +102,51 @@ public class FileService : IFileService
 
             throw;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteFileAsync(string path)
+    {
+        System.IO.File.Delete(path);
+        await Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public async Task CreateAsync(CreateFileInput input)
+    {
+        var fileName = Path.Combine(input.Path, input.Name);
+        if (!Directory.Exists(input.Path))
+        {
+            throw new BusinessException("文件夹不存在");
+        }
+
+        if (System.IO.File.Exists(fileName))
+        {
+            throw new BusinessException("文件名重复");
+        }
+
+        using var fileStream = System.IO.File.Create(fileName);
+
+        if (!string.IsNullOrEmpty(input.Content))
+        {
+            await fileStream.WriteAsync(Encoding.UTF8.GetBytes(input.Content));
+        }
+
+        await fileStream.FlushAsync();
+
+        fileStream.Close();
+    }
+
+    /// <inheritdoc />
+    public async Task ExtractToDirectoryAsync(string path,string name)
+    {
+        if (!Directory.Exists(path))
+        {
+            throw new BusinessException("文件夹不存在");
+        }
+
+        ZipFile.ExtractToDirectory(Path.Combine(path,name), path);
+
+        await Task.CompletedTask;
     }
 }

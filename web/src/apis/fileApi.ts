@@ -1,15 +1,16 @@
+import { CreateFileInput } from '@/module/createFileInput';
 import { GetListInput } from '@/module/getListInput';
 import { SaveFileContentInput } from '@/module/saveFileContentInput';
 import request from '@/utils/request';
 
-const name = '/api/file';
+const api = '/api/file';
 
 class fileApi {
   /**
    * 获取文件列表
    */
   getList(input: GetListInput) {
-    return request.get(name + '/list', {
+    return request.get(api + '/list', {
       params: input
     });
   }
@@ -18,7 +19,7 @@ class fileApi {
    * 获取文件内容
    */
   getFileContent(filePath: string) {
-    return request.get(name + '/content?filePath=' + filePath);
+    return request.get(api + '/content?filePath=' + filePath);
   }
 
   /**
@@ -27,9 +28,39 @@ class fileApi {
    * @returns 
    */
   saveFileContent(input: SaveFileContentInput) {
-    return request.post(name + '/save', {
+    return request.post(api + '/save', {
       data: input
     })
+  }
+
+  /**
+   * 删除文件
+   * @param path 
+   * @returns 
+   */
+  deleteFile(path: string) {
+    return request.delete(api + "?path=" + path)
+  }
+
+  /**
+   * 创建文件
+   * @param input 
+   * @returns 
+   */
+  create(input: CreateFileInput) {
+    return request.post(api, {
+      data: input
+    })
+  }
+
+  /**
+   * 解压文件
+   * @param path 
+   * @param name 
+   * @returns 
+   */
+  extractToDirectory(path: string, name: string) {
+    return request.post(api + '/extract-directory?path=' + path + "&name=" + name)
   }
 }
 export default new fileApi();

@@ -27,5 +27,27 @@ namespace File.Application.Contract.Files
         /// <param name="content">文件内容</param>
         /// <returns></returns>
         Task SaveFileContentAsync(SaveFileContentInput input);
+
+        /// <summary>
+        /// 删除文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        Task DeleteFileAsync(string path);
+
+        /// <summary>
+        /// 创建文件
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        Task CreateAsync(CreateFileInput input);
+
+        /// <summary>
+        /// 解压压缩文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Task ExtractToDirectoryAsync(string path, string name);
     }
 }

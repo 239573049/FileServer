@@ -4,6 +4,7 @@ using File.Application.Contract.Files.Dto;
 using File.Application.Contract.Files.Input;
 using System.IO.Compression;
 using System.Text;
+using File.Shared;
 
 namespace File.Application.Files;
 

@@ -5,17 +5,42 @@ import { UserOutlined } from '@ant-design/icons';
 import { Link } from 'umi';
 import styles from './index.less';
 import menu from './menu';
+import authApi from '@/apis/authApi';
+
+
 export default class App extends Component {
   state = {
     pathname: '',
+    userInfo: {
+      avatar: '',
+      username: "",
+      id: ''
+    }
   };
 
   constructor(props: any) {
     super(props);
+    this.getUserInfo()
+  }
+
+  getUserInfo() {
+    var { userInfo } = this.state;
+    authApi.get()
+      .then(res => {
+        userInfo = res;
+        this.setState({
+          userInfo
+        })
+      })
+  }
+
+  exit() {
+    window.localStorage.removeItem("token")
+    window.location.href = "./login"
   }
 
   render(): ReactNode {
-    var { pathname } = this.state;
+    var { pathname, userInfo } = this.state;
     return (
       <div
         style={{
@@ -63,7 +88,7 @@ export default class App extends Component {
                 content={() => (
                   <div style={{ width: '100%' }}>
                     <div className={styles.popover}>个人资料</div>
-                    <div className={styles.popover}>退出登录</div>
+                    <div className={styles.popover} onClick={() => this.exit()}>退出登录</div>
                   </div>
                 )}
                 trigger="click"
@@ -71,7 +96,7 @@ export default class App extends Component {
                 <Avatar
                   shape="square"
                   size="large"
-                  src=""
+                  src={userInfo.avatar}
                   icon={<UserOutlined />}
                 />
               </Popover>

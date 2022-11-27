@@ -19,6 +19,7 @@ import { SaveFileContentInput } from '@/module/saveFileContentInput';
 import { FileContentDto } from '@/module/fileContentDto';
 import CreateDirectory from '@/components/directory/create';
 import CreateFile from '@/components/file/create';
+import CreateRouteMapping from '@/components/routeMapping/create';
 
 const { Dragger } = Upload;
 
@@ -43,6 +44,10 @@ interface IState {
   },
   createFile: {
     open: boolean
+  },
+  createRoute: {
+    open: boolean,
+    info: FilesListDto
   }
 }
 
@@ -75,6 +80,19 @@ class File extends Component<IProps, IState> {
     },
     createFile: {
       open: false
+    },
+    createRoute: {
+      open: false,
+      info: {
+        type: FileType.Directory,
+        name: null,
+        length: 0,
+        icon: null,
+        updateTime: null,
+        fileType: null,
+        createdTime: null,
+        fullName: null,
+      }
     }
   };
 
@@ -202,8 +220,11 @@ class File extends Component<IProps, IState> {
             <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
               删除
             </div>
+            <div className='file-delete' onClick={() => this.setRoute(item)}>
+              设置路由
+            </div>
             <div className="file-button" onClick={() => this.extractDirectory(item)}>
-              解压到当前路径
+              解压Zip
             </div>
           </span>)
       }
@@ -212,6 +233,9 @@ class File extends Component<IProps, IState> {
         <span>
           <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
             删除
+          </div>
+          <div className='file-delete' onClick={() => this.setRoute(item)}>
+            设置路由
           </div>
           <div className="file-button" onClick={() => this.onOpenFile(item)}>
             编辑
@@ -223,13 +247,28 @@ class File extends Component<IProps, IState> {
           <div className='file-delete' onClick={() => this.deleteDirectory(item)}>
             删除
           </div>
+          <div className='file-delete' onClick={() => this.setRoute(item)}>
+            设置路由
+          </div>
         </div>)
     }
 
   }
 
+  setRoute(item: FilesListDto) {
+    var { createRoute } = this.state
+    createRoute.info = item;
+    createRoute.open = true;
+    this.setState({
+      createRoute
+    })
+  }
 
-
+  /**
+   * 获取列表展示
+   * @param item 
+   * @returns 
+   */
   getList(item: FilesListDto) {
     return (
       <Tooltip placement="topLeft" title={() => this.feature(item)} trigger='contextMenu'>
@@ -255,9 +294,11 @@ class File extends Component<IProps, IState> {
   getListData() {
     fileApi.getList(this.state.input)
       .then((res: any) => {
-        this.setState({
-          data: res
-        })
+        if (res != undefined) {
+          this.setState({
+            data: res
+          })
+        }
       })
   }
 
@@ -307,7 +348,7 @@ class File extends Component<IProps, IState> {
   }
 
   render(): ReactNode {
-    var { data, input, fileshow, file, fileContent, options, edit, createDirectory, createFile } = this.state;
+    var { data, input, fileshow, file, fileContent, createRoute, edit, createDirectory, createFile } = this.state;
     return (<div>
       <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
@@ -385,6 +426,10 @@ class File extends Component<IProps, IState> {
         this.setState({
           createFile
         })
+      }} />
+      <CreateRouteMapping info={createRoute.info} isModalOpen={createRoute.open} load={createRoute.open} onCancel={(value: boolean) => {
+        createRoute.open = false;
+        this.setState({ createRoute })
       }} />
     </div>);
   }

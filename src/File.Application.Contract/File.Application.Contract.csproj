@@ -6,4 +6,13 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\File.Shared\File.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="RouteMappings\Dto\" />
+    <Folder Include="Eto\" />
+  </ItemGroup>
+
 </Project>

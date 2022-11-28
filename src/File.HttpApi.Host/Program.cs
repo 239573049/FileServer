@@ -90,6 +90,8 @@ app.Use(async (content, next) =>
 // ×¢ÒâÊ¹ÓÃË³Ğò·ÀÖ¹´íÎó
 app.UseFileApplication();
 
+app.UseStaticFiles();
+
 #region file
 
 app.MapGet("/api/file/list", (IFileService fileService, string? name, string? path, int? page, int? pageSize)

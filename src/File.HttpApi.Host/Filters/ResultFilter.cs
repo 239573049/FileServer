@@ -36,7 +36,7 @@ public class ResultFilter : ActionFilterAttribute
         {
             context.Result = new ObjectResult(new HttpResultDto(200));
         }
-
+    
         base.OnActionExecuted(context);
     }
 }

@@ -16,27 +16,39 @@ class CreateRouteMapping extends Component<IProps>{
 
     state = {
         input: {
+            fullName: '',
             route: '',
             path: "",
             type: FileType.File,
             visitor: false,
         },
+        open: true
     }
 
     constructor(props: IProps) {
         super(props)
-        this.getRoute()
+        var { input } = this.state;
+        input.fullName = props.info.fullName!;
+        this.getRoute(true, props.info.fullName!)
     }
 
-    componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<{}>, snapshot?: any): void {
-        if (this.props.load) {
-            this.getRoute()
+
+    shouldComponentUpdate(nextProps: Readonly<IProps>, nextState: Readonly<any>, nextContext: any): boolean {
+        var { open } = nextState;
+        console.log(open);
+        console.log(nextProps.isModalOpen);
+
+        if (open === true) {
+            if (nextProps.isModalOpen) {
+                this.getRoute(false, nextProps.info.fullName!)
+            }
         }
+        return true;
     }
 
-    getRoute() {
+    getRoute(update: boolean, fullName: string) {
         var { input } = this.state
-        routeMappingApi.get(this.props.info.fullName ?? "")
+        routeMappingApi.get(fullName ?? "")
             .then(res => {
                 if (res != undefined) {
                     if (res.path !== "") {
@@ -44,7 +56,8 @@ class CreateRouteMapping extends Component<IProps>{
                         input.type = res.type;
                         input.visitor = res.visitor;
                         this.setState({
-                            input
+                            input,
+                            open: false
                         })
                     }
                 }

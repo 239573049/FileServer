@@ -34,7 +34,9 @@ class Index extends Component {
             </ProCard>
           </ProCard>
           <ProCard title="流量趋势">
-            <div>图表</div>
+            <div>
+
+            </div>
             <div>图表</div>
             <div>图表</div>
             <div>图表</div>

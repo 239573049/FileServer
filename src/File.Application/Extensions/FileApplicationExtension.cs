@@ -88,24 +88,23 @@ public static class FileApplicationExtension
     /// <param name="services"></param>
     private static async Task AddRouteMapping(this IServiceCollection services)
     {
-        var dbContext = services.BuildServiceProvider().GetService<FileDbContext>();
-        var routes = new List<RouteMapping>();
+        var mappings = new ConcurrentDictionary<string, RouteMapping>();
         try
         {
+            var dbContext = services.BuildServiceProvider().GetService<FileDbContext>();
+            var routes = new List<RouteMapping>();
             routes.AddRange(await dbContext!.RouteMappings.ToListAsync());
-        }
-        catch (Exception)
-        {
-        }
+            routes.ForEach(x =>
+            {
+                mappings.TryAdd(x.Route, x);
+            });
 
-        var mappings = new ConcurrentDictionary<string, RouteMapping>();
-        routes.ForEach(x =>
+        }
+        catch (Exception exception)
         {
-            mappings.TryAdd(x.Route, x);
-        });
-
+            await Console.Error.WriteLineAsync(exception.Message);
+        }
         services.AddSingleton(mappings);
-
     }
 
     /// <summary>

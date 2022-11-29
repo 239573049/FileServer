@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace File.Application.Migrations
 {
     /// <inheritdoc />
-    public partial class addStatistics : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,7 +82,7 @@ namespace File.Application.Migrations
                 schema: "用户",
                 table: "UserInfos",
                 columns: new[] { "Id", "Avatar", "Password", "Username" },
-                values: new object[] { new Guid("7658c37e-6c08-476e-a0b0-04e8752abe9c"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin" });
+                values: new object[] { new Guid("d307357e-adf0-4be7-9c5c-f3751c231db1"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_InterfaceStatistics_Id",

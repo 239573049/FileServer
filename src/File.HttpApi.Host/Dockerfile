@@ -14,10 +14,10 @@ COPY ["src/File.Entity/File.Entity.csproj", "src/File.Entity/"]
 RUN dotnet restore "src/File.HttpApi.Host/File.HttpApi.Host.csproj"
 COPY . .
 WORKDIR "/src/src/File.HttpApi.Host"
-RUN dotnet build "File.HttpApi.Host.csproj" -c Release --os linux -o /app/build
+RUN dotnet build "File.HttpApi.Host.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "File.HttpApi.Host.csproj" -c Release --os linux -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "File.HttpApi.Host.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

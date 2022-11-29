@@ -131,7 +131,7 @@ namespace File.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7658c37e-6c08-476e-a0b0-04e8752abe9c"),
+                            Id = new Guid("d307357e-adf0-4be7-9c5c-f3751c231db1"),
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png",
                             Password = "Aa123456.",
                             Username = "admin"

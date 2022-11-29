@@ -62,5 +62,26 @@ class fileApi {
   extractToDirectory(path: string, name: string) {
     return request.post(api + '/extract-directory?path=' + path + "&name=" + name)
   }
+
+  /**
+   * 上传文件
+   * @param path 
+   * @param files 
+   * @returns 
+   */
+  uploading(path: string, file: any, name: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return request.post(api + '/uploading', {
+      params: {
+        path: path,
+        name: name
+      },
+      requestType: 'form',
+      data: formData
+    })
+  }
+
 }
 export default new fileApi();

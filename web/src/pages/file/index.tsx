@@ -323,9 +323,16 @@ class File extends Component<IProps, IState> {
 
   }
 
-  beforeUpload(file: any[]) {
+  beforeUpload(file: any) {
     console.log(file);
 
+    fileApi.uploading(this.state.input.path, file, file.webkitRelativePath)
+      .then(res => {
+        if (res != undefined) {
+          message.success("成功上传文件")
+          this.getListData()
+        }
+      })
     return false;
   }
 
@@ -366,7 +373,7 @@ class File extends Component<IProps, IState> {
   render(): ReactNode {
     var { data, input, fileshow, file, fileContent, createRoute, edit, createDirectory, createFile } = this.state;
     return (<div>
-      <Dragger multiple {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
+      <Dragger directory multiple showUploadList={false} {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
           <Search onSearch={() => this.getListData()} style={{ width: "50%" }} value={input.path} onChange={(value) => {
             input.path = value.target.value

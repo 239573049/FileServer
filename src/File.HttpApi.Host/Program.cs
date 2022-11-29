@@ -17,6 +17,9 @@ using System.Text;
 using System.Text.Json;
 using File.Application.Contract.Statistics;
 using File.Application.Contract.Statistics.Input;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Http.Features;
 
 try
 {
@@ -94,50 +97,79 @@ try
     #region file
 
     app.MapGet("/api/file/list", (IFileService fileService, string? name, string? path, int? page, int? pageSize)
-        => fileService.GetListAsync(new GetListInput(name, path, page, pageSize)));
+        => fileService.GetListAsync(new GetListInput(name, path, page, pageSize)))
+        .RequireAuthorization();
 
     app.MapGet("/api/file/content", (IFileService fileService, string filePath)
-        => fileService.GetFileContentAsync(filePath));
+        => fileService.GetFileContentAsync(filePath))
+        .RequireAuthorization();
 
     app.MapPost("/api/file/save", (IFileService fileService, SaveFileContentInput input)
-        => fileService.SaveFileContentAsync(input));
+        => fileService.SaveFileContentAsync(input))
+        .RequireAuthorization();
 
     app.MapDelete("/api/file", (IFileService fileService, string path)
-        => fileService.DeleteFileAsync(path));
+        => fileService.DeleteFileAsync(path))
+        .RequireAuthorization();
 
     app.MapPost("/api/file", (IFileService fileService, CreateFileInput input)
-        => fileService.CreateAsync(input));
+        => fileService.CreateAsync(input))
+        .RequireAuthorization();
 
     app.MapPost("/api/file/extract-directory", (IFileService fileService, string path, string name)
-        => fileService.ExtractToDirectoryAsync(path, name));
+        => fileService.ExtractToDirectoryAsync(path, name))
+        .RequireAuthorization();
 
-
+    app.MapPost("/api/file/uploading", async (string path, string name, [FromForm] IFormFile file) =>
+    {
+        try
+        {
+            var p = Path.Combine(path, name.TrimEnd(file.FileName.ToCharArray()));
+            if (!Directory.Exists(p))
+            {
+                Directory.CreateDirectory(p);
+            }
+            await using var fileStream = System.IO.File.Open(Path.Combine(p, file.FileName), FileMode.Create, FileAccess.Write);
+            await file.CopyToAsync(fileStream);
+            fileStream.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }).RequireAuthorization();
 
     #endregion
 
     #region directory
 
     app.MapDelete("/api/directory", (IDirectoryService directoryService, string path)
-        => directoryService.DeleteAsync(path));
+        => directoryService.DeleteAsync(path))
+        .RequireAuthorization();
 
     app.MapPost("/api/directory", (IDirectoryService directoryService, string path, string name)
-        => directoryService.CreateAsync(path, name));
+        => directoryService.CreateAsync(path, name))
+        .RequireAuthorization();
 
     app.MapPut("/api/directory/rename", (IDirectoryService directoryService, string fullName, string path, string name)
-        => directoryService.RenameAsync(fullName, path, name));
+        => directoryService.RenameAsync(fullName, path, name))
+        .RequireAuthorization();
 
     #endregion
 
     #region routeMapping
 
     app.MapPost("/api/route-mapping", (IRouteMappingService routeMappingService, CreateRouteMappingInput input)
-        => routeMappingService.CreateAsync(input));
+        => routeMappingService.CreateAsync(input))
+        .RequireAuthorization();
 
     app.MapDelete("/api/route-mapping", (IRouteMappingService routeMappingService, string route)
-        => routeMappingService.DeleteAsync(route));
+        => routeMappingService.DeleteAsync(route))
+        .RequireAuthorization();
 
     app.MapGet("/api/route-mapping", (IRouteMappingService routeMappingService, string path)
-        => routeMappingService.GetAsync(path));
+        => routeMappingService.GetAsync(path))
+        .RequireAuthorization();
 
 
     #endregion
@@ -170,17 +202,20 @@ try
         });
 
     app.MapGet("/api/user-info", (IUserInfoService userInfoService)
-        => userInfoService.GetAsync());
+        => userInfoService.GetAsync())
+        .RequireAuthorization(); ;
 
     #endregion
 
     #region statistics
 
     app.MapGet("/api/statistics/statistics", (IStatisticsService statisticsService)
-        => statisticsService.GetStatisticsAsync());
+        => statisticsService.GetStatisticsAsync())
+        .RequireAuthorization(); ;
 
     app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType type)
-        => statisticsService.GetPieAsync(new PieInput() { Type = type }));
+        => statisticsService.GetPieAsync(new PieInput() { Type = type }))
+        .RequireAuthorization(); ;
 
     #endregion
 

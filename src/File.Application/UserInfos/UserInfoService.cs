@@ -47,7 +47,7 @@ public class UserInfoService : IUserInfoService
 
         if (userInfo == null)
         {
-            throw new BusinessException("账号获取错误");
+            throw new BusinessException("账号获取错误",401);
         }
 
         return new UserInfoDto()

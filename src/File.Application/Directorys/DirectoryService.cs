@@ -36,7 +36,7 @@ internal class DirectoryService : IDirectoryService
 
     public async Task DeleteAsync(string path)
     {
-        Directory.Delete(path);
+        Directory.Delete(path,true);
      
         await Task.CompletedTask;
     }

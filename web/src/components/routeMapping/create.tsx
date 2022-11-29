@@ -3,16 +3,8 @@ import { Modal, Input, message, Radio } from 'antd';
 import { FilesListDto, FileType } from "@/module/filesListDto";
 import routeMappingApi from "@/apis/routeMappingApi";
 
-interface IProps {
-    isModalOpen: boolean,
-    onCancel: any,
-    info: FilesListDto,
-    load: boolean
-}
 
-
-
-class CreateRouteMapping extends Component<IProps>{
+class CreateRouteMapping extends Component {
 
     state = {
         input: {
@@ -22,74 +14,62 @@ class CreateRouteMapping extends Component<IProps>{
             type: FileType.File,
             visitor: false,
         },
-        open: true
+        show: false
     }
 
-    constructor(props: IProps) {
-        super(props)
-        var { input } = this.state;
-        input.fullName = props.info.fullName!;
-        this.getRoute(true, props.info.fullName!)
+    update(info: FilesListDto) {
+        this.getRoute(info)
+        this.setState({
+            show: true
+        })
     }
 
-
-    shouldComponentUpdate(nextProps: Readonly<IProps>, nextState: Readonly<any>, nextContext: any): boolean {
-        var { open } = nextState;
-        console.log(open);
-        console.log(nextProps.isModalOpen);
-
-        if (open === true) {
-            if (nextProps.isModalOpen) {
-                this.getRoute(false, nextProps.info.fullName!)
-            }
-        }
-        return true;
-    }
-
-    getRoute(update: boolean, fullName: string) {
+    getRoute(info: FilesListDto) {
         var { input } = this.state
-        routeMappingApi.get(fullName ?? "")
-            .then(res => {
-                if (res != undefined) {
-                    if (res.path !== "") {
-                        input.route = res.route;
-                        input.type = res.type;
-                        input.visitor = res.visitor;
-                        this.setState({
-                            input,
-                            open: false
-                        })
+        if (info) {
+            routeMappingApi.get(info.fullName ?? "")
+                .then(res => {
+                    if (res != undefined) {
+                        input.path = info.fullName!;
+                        input.type = info.type;
+                        if (res.path !== "") {
+                            input.route = res.route;
+                            input.type = res.type;
+                            input.visitor = res.visitor;
+                            this.setState({
+                                input
+                            })
+                        }
                     }
-                }
-            })
+                })
+        }
     }
 
     handleOk() {
-        var { info } = this.props;
         var { input } = this.state;
-        if (input.route.startsWith("/") === false) {
+        if (input?.route?.startsWith("/") === false) {
             message.error("路由开头必须使用“/”")
             return
         }
-
-        input.path = info.fullName!;
-        input.type = info.type!;
-
         routeMappingApi.create(this.state.input)
             .then(res => {
                 if (res != undefined) {
-
+                    this.setState({
+                        show: false
+                    })
                 }
             });
     }
 
     handleCancel() {
-        this.props.onCancel(false)
+        this.setState({
+            show: false
+        })
     }
     render(): ReactNode {
-        var { input } = this.state
+        var { input, show } = this.state
         return (
-            <Modal title="新建路由映射配置" open={this.props.isModalOpen} onOk={() => this.handleOk()} onCancel={() => this.handleCancel()} >
+            <Modal title="新建路由映射配置" open={show} onOk={() => this.handleOk()} onCancel={() => this.handleCancel()} >
                 <Input value={input.route} onChange={(e) => {
                     input.route = e.target.value
                     this.setState({

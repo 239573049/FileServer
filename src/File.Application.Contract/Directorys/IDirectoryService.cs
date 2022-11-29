@@ -17,4 +17,13 @@ public interface IDirectoryService
     /// <param name="name"></param>
     /// <returns></returns>
     Task CreateAsync(string path, string name);
+
+    /// <summary>
+    /// 重命名
+    /// </summary>
+    /// <param name="fullName">原地址</param>
+    /// <param name="path">新目录</param>
+    /// <param name="name">原名称</param>
+    /// <returns></returns>
+    Task RenameAsync(string fullName, string path, string name);
 }

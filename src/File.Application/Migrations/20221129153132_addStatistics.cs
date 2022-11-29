@@ -6,16 +6,38 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace File.Application.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class addStatistics : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
+                name: "接口访问统计");
+
+            migrationBuilder.EnsureSchema(
                 name: "路由映射缓存表");
 
             migrationBuilder.EnsureSchema(
                 name: "用户");
+
+            migrationBuilder.CreateTable(
+                name: "InterfaceStatistics",
+                schema: "接口访问统计",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Code = table.Column<int>(type: "INTEGER", nullable: false),
+                    Succeed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ResponseTime = table.Column<long>(type: "INTEGER", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedTime = table.Column<DateTime>(type: "TEXT", nullable: false, comment: "访问时间"),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: true, comment: "具体访问人id"),
+                    Query = table.Column<string>(type: "TEXT", nullable: false, comment: "访问时携带的参数")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InterfaceStatistics", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "UserInfos",
@@ -60,7 +82,20 @@ namespace File.Application.Migrations
                 schema: "用户",
                 table: "UserInfos",
                 columns: new[] { "Id", "Avatar", "Password", "Username" },
-                values: new object[] { new Guid("53e76abc-f1b0-4d71-ba5e-d478d0017fef"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin" });
+                values: new object[] { new Guid("7658c37e-6c08-476e-a0b0-04e8752abe9c"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterfaceStatistics_Id",
+                schema: "接口访问统计",
+                table: "InterfaceStatistics",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterfaceStatistics_UserId",
+                schema: "接口访问统计",
+                table: "InterfaceStatistics",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RouteMappings_CreateUserInfoId",
@@ -93,6 +128,10 @@ namespace File.Application.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "InterfaceStatistics",
+                schema: "接口访问统计");
+
             migrationBuilder.DropTable(
                 name: "RouteMappings",
                 schema: "路由映射缓存表");

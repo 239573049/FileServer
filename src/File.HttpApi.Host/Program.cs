@@ -1,22 +1,22 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using File.Application.Contract.Base;
 using File.Application.Contract.Directorys;
 using File.Application.Contract.Files;
 using File.Application.Contract.Files.Input;
-using File.Application.Extensions;
-using File.HttpApi.Host.Filters;
-using System.Text.Json;
 using File.Application.Contract.Options;
 using File.Application.Contract.RouteMappings;
 using File.Application.Contract.RouteMappings.Input;
 using File.Application.Contract.UserInfos;
 using File.Application.Contract.UserInfos.Input;
+using File.Application.Extensions;
+using File.HttpApi.Host.Filters;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
-using Microsoft.AspNetCore.Builder;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using File.Application.Contract.Statistics;
+using File.Application.Contract.Statistics.Input;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,34 +124,38 @@ app.MapDelete("/api/directory", (IDirectoryService directoryService, string path
 app.MapPost("/api/directory", (IDirectoryService directoryService, string path, string name)
     => directoryService.CreateAsync(path, name));
 
+app.MapPut("/api/directory/rename", (IDirectoryService directoryService, string fullName, string path, string name)
+    => directoryService.RenameAsync(fullName, path, name));
+
 #endregion
 
 #region routeMapping
 
-app.MapPost("/api/route-mapping", (IRouteMappingService routeMappingService,CreateRouteMappingInput input) 
+app.MapPost("/api/route-mapping", (IRouteMappingService routeMappingService, CreateRouteMappingInput input)
     => routeMappingService.CreateAsync(input));
 
-app.MapDelete("/api/route-mapping", (IRouteMappingService routeMappingService,string route) 
+app.MapDelete("/api/route-mapping", (IRouteMappingService routeMappingService, string route)
     => routeMappingService.DeleteAsync(route));
 
 app.MapGet("/api/route-mapping", (IRouteMappingService routeMappingService, string path)
     => routeMappingService.GetAsync(path));
 
+
 #endregion
 
 #region auth
 
-app.MapPost("/api/auth", async (IUserInfoService userInfoService, AuthInput input,IOptions<TokenOptions> tokenOptions)
+app.MapPost("/api/auth", async (IUserInfoService userInfoService, AuthInput input, IOptions<TokenOptions> tokenOptions)
     =>
 {
     var userInfo = await userInfoService.AuthAsync(input);
-    
+
     var claims = new[]
     {
         new Claim("userInfo", JsonSerializer.Serialize(userInfo)),
         new Claim("Id", userInfo.Id.ToString())
     };
-    
+
     var cred = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.Value.SecretKey)),
         SecurityAlgorithms.HmacSha256);
 
@@ -169,6 +173,15 @@ app.MapGet("/api/user-info", (IUserInfoService userInfoService)
 
 #endregion
 
+#region statistics
+
+app.MapGet("/api/statistics/statistics", (IStatisticsService statisticsService)
+    => statisticsService.GetStatisticsAsync());
+
+app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType type)
+    => statisticsService.GetPieAsync(new PieInput() { Type = type }));
+
+#endregion
 app.UseCors("CorsPolicy");
 
 await app.RunAsync();

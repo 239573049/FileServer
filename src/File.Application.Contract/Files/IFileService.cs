@@ -23,8 +23,7 @@ namespace File.Application.Contract.Files
         /// <summary>
         /// 保存文件
         /// </summary>
-        /// <param name="filePath">文件地址</param>
-        /// <param name="content">文件内容</param>
+        /// <param name="input"></param>
         /// <returns></returns>
         Task SaveFileContentAsync(SaveFileContentInput input);
 

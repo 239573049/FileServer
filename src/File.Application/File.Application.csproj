@@ -18,7 +18,6 @@
   <ItemGroup>
     <Folder Include="Files\" />
     <Folder Include="EventBus\" />
-    <Folder Include="Statistics\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,14 +11,56 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace File.Application.Migrations
 {
     [DbContext(typeof(FileDbContext))]
-    [Migration("20221127160657_init")]
-    partial class init
+    [Migration("20221129153132_addStatistics")]
+    partial class addStatistics
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
+
+            modelBuilder.Entity("File.Entity.InterfaceStatistics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Code")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("TEXT")
+                        .HasComment("访问时间");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Query")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasComment("访问时携带的参数");
+
+                    b.Property<long>("ResponseTime")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Succeed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasComment("具体访问人id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("InterfaceStatistics", "接口访问统计");
+                });
 
             modelBuilder.Entity("File.Entity.RouteMapping", b =>
                 {
@@ -92,7 +134,7 @@ namespace File.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("53e76abc-f1b0-4d71-ba5e-d478d0017fef"),
+                            Id = new Guid("7658c37e-6c08-476e-a0b0-04e8752abe9c"),
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png",
                             Password = "Aa123456.",
                             Username = "admin"

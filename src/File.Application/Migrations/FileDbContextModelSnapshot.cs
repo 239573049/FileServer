@@ -39,6 +39,9 @@ namespace File.Application.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("访问时携带的参数");
 
+                    b.Property<long>("ResponseTime")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("Succeed")
                         .HasColumnType("INTEGER");
 
@@ -51,8 +54,7 @@ namespace File.Application.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("InterfaceStatistics", "接口访问统计");
                 });
@@ -129,7 +131,7 @@ namespace File.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6f3ff718-7db1-4576-b0e8-cd6e4cb17279"),
+                            Id = new Guid("7658c37e-6c08-476e-a0b0-04e8752abe9c"),
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png",
                             Password = "Aa123456.",
                             Username = "admin"

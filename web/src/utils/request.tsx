@@ -15,10 +15,11 @@ const errorHandler = (error: any) => {
   }
 };
 
+console.log('环境', process.env.NODE_ENV);
 
 const request = extend({
   errorHandler, // 默认错误处理
-  prefix: baseUrl,
+  prefix: process.env.NODE_ENV === "development" ? baseUrl : "",
   credentials: 'include', // 默认请求是否带上cookie
 });
 

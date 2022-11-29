@@ -13,6 +13,7 @@
   <ItemGroup>
     <Folder Include="RouteMappings\Dto\" />
     <Folder Include="Eto\" />
+    <Folder Include="Statistics\Input\" />
   </ItemGroup>
 
 </Project>

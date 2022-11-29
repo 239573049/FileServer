@@ -20,4 +20,19 @@ public class InterfaceStatisticsEto
     /// 访问携带的参数
     /// </summary>
     public string Query { get; set; } = null!;
+
+    /// <summary>
+    /// 访问响应状态码
+    /// </summary>
+    public int Code { get; set; }
+
+    /// <summary>
+    /// 是否成功
+    /// </summary>
+    public bool Succeed { get; set; }
+
+    /// <summary>
+    /// 响应耗时（ms）
+    /// </summary>
+    public long ResponseTime { get; set; }
 }

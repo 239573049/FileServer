@@ -14,6 +14,14 @@ public class InterfaceStatistics
     /// </summary>
     public bool Succeed { get; set; }
 
+    /// <summary>
+    /// 响应耗时（ms）
+    /// </summary>
+    public long ResponseTime { get; set; }
+
+    /// <summary>
+    /// 访问接口
+    /// </summary>
     public string Path { get; set; } = null!;
 
     /// <summary>

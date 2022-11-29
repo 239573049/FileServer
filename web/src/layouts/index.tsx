@@ -6,7 +6,8 @@ import { Link } from 'umi';
 import styles from './index.less';
 import menu from './menu';
 import authApi from '@/apis/authApi';
-
+import { history } from 'umi';
+import "@ant-design/flowchart/dist/index.css";
 
 export default class App extends Component {
   state = {
@@ -36,7 +37,7 @@ export default class App extends Component {
 
   exit() {
     window.localStorage.removeItem("token")
-    window.location.href = "./login"
+    history.push("./login")
   }
 
   render(): ReactNode {

@@ -3,11 +3,10 @@ import { PagedResultDto } from '@/module/pagedResultDto';
 import { Component, ReactNode } from 'react';
 import fileApi from '../../apis/fileApi';
 import directoryApi from '../../apis/directoryApi'
-import { Input, List, Upload, message } from 'antd';
+import { Input, List, Upload, message, Popconfirm, Modal, Button, Tooltip } from 'antd';
 import './index.less'
-import { Modal, Button, Tooltip } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-
+import { change } from '@/utils/util'
 import Editor from "@monaco-editor/react";
 
 import {
@@ -20,6 +19,7 @@ import { FileContentDto } from '@/module/fileContentDto';
 import CreateDirectory from '@/components/directory/create';
 import CreateFile from '@/components/file/create';
 import CreateRouteMapping from '@/components/routeMapping/create';
+import React from 'react';
 
 const { Dragger } = Upload;
 
@@ -30,6 +30,7 @@ interface IProps { }
 interface IState {
   fileshow: boolean,
   data: PagedResultDto<FilesListDto>;
+  rename: string,
   input: GetListInput,
   file: FilesListDto | null,
   fileContent: SaveFileContentInput,
@@ -47,12 +48,14 @@ interface IState {
   },
   createRoute: {
     open: boolean,
-    info: FilesListDto
+    info: FilesListDto,
+    CreateRouteComponent: any
   }
 }
 
 class File extends Component<IProps, IState> {
   state: Readonly<IState> = {
+    rename: '',
     fileshow: false,
     data: {
       items: [],
@@ -92,12 +95,14 @@ class File extends Component<IProps, IState> {
         fileType: null,
         createdTime: null,
         fullName: null,
-      }
+      },
+      CreateRouteComponent: null
     }
   };
 
   constructor(props: IProps) {
-    super(props)
+    super(props);
+    this.state.createRoute.CreateRouteComponent = React.createRef();
     this.getListData()
     document.oncontextmenu = function (e) {
       return false
@@ -211,48 +216,53 @@ class File extends Component<IProps, IState> {
    * @returns 
    */
   feature(item: FilesListDto) {
-    if (item.type === FileType.File) {
+    return (
+      <span>
+        <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
+          删除
+        </div>
+        <div className='file-delete' onClick={() => this.setRoute(item)}>
+          设置路由
+        </div>
+        {this.getrename(item)}
+        {item.name?.endsWith(".zip") ? <div className="file-button" onClick={() => this.extractDirectory(item)}>解压Zip</div> : ''}
 
-      if (item.name?.endsWith(".zip")) {
+        {item.type === FileType.File ? <div className="file-button" onClick={() => this.onOpenFile(item)}>编辑</div> : ''}
+      </span>)
+  }
 
-        return (
-          <span>
-            <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
-              删除
-            </div>
-            <div className='file-delete' onClick={() => this.setRoute(item)}>
-              设置路由
-            </div>
-            <div className="file-button" onClick={() => this.extractDirectory(item)}>
-              解压Zip
-            </div>
-          </span>)
-      }
+  getrename(item: FilesListDto) {
+    var { rename } = this.state;
+    return <Popconfirm
+      placement="rightTop"
+      title={<Input placeholder="请输入新名称" value={rename} onChange={(e) => {
+        rename = e.target.value;
+        this.setState({ rename })
+      }} />}
+      onConfirm={() => this.renameOk(item)}
+      onCancel={() => {
+        this.setState({ rename: '' })
+      }}
+      okText="Yes"
+      cancelText="No"
+    >
+      <div className='file-delete' >
+        重命名
+      </div>
+    </Popconfirm>
+  }
 
-      return (
-        <span>
-          <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
-            删除
-          </div>
-          <div className='file-delete' onClick={() => this.setRoute(item)}>
-            设置路由
-          </div>
-          <div className="file-button" onClick={() => this.onOpenFile(item)}>
-            编辑
-          </div>
-        </span>)
-    } else {
-      return (
-        <div>
-          <div className='file-delete' onClick={() => this.deleteDirectory(item)}>
-            删除
-          </div>
-          <div className='file-delete' onClick={() => this.setRoute(item)}>
-            设置路由
-          </div>
-        </div>)
-    }
+  renameOk(item: FilesListDto) {
+    var { rename } = this.state;
+    directoryApi.rename(item.fullName!, rename, item.name!)
+      .then(res => {
+        if (res != undefined) {
+          message.success("修改成功")
+          this.getListData()
+        }
+      })
 
+    this.setState({ rename: '' })
   }
 
   setRoute(item: FilesListDto) {
@@ -262,6 +272,7 @@ class File extends Component<IProps, IState> {
     this.setState({
       createRoute
     })
+    createRoute.CreateRouteComponent.current.update(createRoute.info);
   }
 
   /**
@@ -285,6 +296,11 @@ class File extends Component<IProps, IState> {
             <span className='create-time'>
               创建时间：{item.createdTime}
             </span>
+            {item.type === FileType.File ?
+              <span className='create-time'>
+                文件大小：{change(item.length)}
+              </span>
+              : ""}
           </span>
         </div>
       </Tooltip>
@@ -427,10 +443,7 @@ class File extends Component<IProps, IState> {
           createFile
         })
       }} />
-      <CreateRouteMapping info={createRoute.info} isModalOpen={createRoute.open} load={createRoute.open} onCancel={(value: boolean) => {
-        createRoute.open = false;
-        this.setState({ createRoute })
-      }} />
+      <CreateRouteMapping ref={createRoute.CreateRouteComponent} />
     </div>);
   }
 }

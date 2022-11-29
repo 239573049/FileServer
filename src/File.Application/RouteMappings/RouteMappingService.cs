@@ -36,7 +36,7 @@ public class RouteMappingService : IRouteMappingService
             throw new BusinessException("路径错误，不存在当前文件或者目录");
         }
         
-        var routeMapping = new RouteMapping(input.Route, input.Path, GetFileType(input.Path), input.Visitor,_currentManage.GetUserId());
+        var routeMapping = new RouteMapping(input.Route, input.Path, FileHelper.GetFileType(input.Path), input.Visitor,_currentManage.GetUserId());
 
         await _fileDbContext.RouteMappings.AddAsync(routeMapping);
 
@@ -83,16 +83,5 @@ public class RouteMappingService : IRouteMappingService
             Visitor = data.Visitor
         };
     }
-
-    private FileType GetFileType(string path)
-    {
-        if (System.IO.File.Exists(path))
-        {
-            return FileType.File;
-        }
-        else
-        {
-            return FileType.Directory;
-        }
-    }
+    
 }

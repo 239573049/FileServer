@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
 using System.Text;
 using File.Application.Contract.Eto;
+using File.Application.Contract.Statistics;
 using Token.Extensions;
 using Token.Handlers;
 
@@ -26,30 +27,43 @@ namespace File.Application.Extensions;
 
 public static class FileApplicationExtension
 {
-    public static async void AddFileApplication(this IServiceCollection services,string connectString)
+    public static async void AddFileApplication(this IServiceCollection services, string connectString)
     {
         services.AddTransient<IFileService, FileService>();
         services.AddTransient<IDirectoryService, DirectoryService>();
         services.AddTransient<IRouteMappingService, RouteMappingService>();
         services.AddTransient<IUserInfoService, UserInfoService>();
+        services.AddTransient<IStatisticsService, StatisticsService>();
         services.AddTransient<CurrentManage>();
 
         services.AddDbContext<FileDbContext>(options =>
         {
             options.UseSqlite(connectString);
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
+
+        });
+
+        services.AddSingleton((service) =>
+        {
+            var options = new StatisticsOptions();
+            options.IgnoreUri.Add("/api/statistics/pie");
+            options.IgnoreUri.Add("/api/statistics/statistics");
+            options.IgnoreUri.Add("/api/auth");
+            return options;
         });
 
         await services.AddRouteMapping();
 
+        // 注入本地事件服务
         services.AddEventBus();
         services.AddTransient<FileMiddleware>();
-        
-        services.AddSingleton(typeof(ILoadEventHandler<InterfaceStatisticsEto>),typeof(InterfaceStatisticsEventHandle));
+
+        services.AddTransient(typeof(ILoadEventHandler<InterfaceStatisticsEto>), typeof(InterfaceStatisticsEventHandle));
 
         services.AddTransient<InterfaceStatisticsMiddleware>();
     }
 
-    public static void AddJwt(this IServiceCollection services,TokenOptions tokenOption)
+    public static void AddJwt(this IServiceCollection services, TokenOptions tokenOption)
     {
         services.AddAuthorization();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -67,7 +81,7 @@ public static class FileApplicationExtension
                 };
             });
     }
-    
+
     /// <summary>
     /// 加载缓存
     /// </summary>
@@ -84,7 +98,7 @@ public static class FileApplicationExtension
         {
         }
 
-        var mappings = new ConcurrentDictionary<string,RouteMapping>();
+        var mappings = new ConcurrentDictionary<string, RouteMapping>();
         routes.ForEach(x =>
         {
             mappings.TryAdd(x.Route, x);

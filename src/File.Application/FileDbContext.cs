@@ -53,7 +53,7 @@ public class FileDbContext : DbContext
             x.ToTable("InterfaceStatistics", "接口访问统计");
 
             x.HasIndex(x => x.Id).IsUnique();
-            x.HasIndex(x => x.UserId).IsUnique();
+            x.HasIndex(x => x.UserId);
 
             x.Property(x => x.UserId).HasComment("具体访问人id");
             x.Property(x => x.CreatedTime).HasComment("访问时间");

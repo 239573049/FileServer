@@ -11,26 +11,27 @@ namespace File.Application.EventBus;
 /// </summary>
 public class InterfaceStatisticsEventHandle : ILoadEventHandler<InterfaceStatisticsEto>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _serviceProvider;
 
-    public InterfaceStatisticsEventHandle(IServiceProvider serviceProvider)
+    public InterfaceStatisticsEventHandle(IServiceScopeFactory serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
     public async Task HandleEventAsync(InterfaceStatisticsEto eventData)
     {
-        // var fileDbContext = _serviceProvider.GetService<FileDbContext>();
-        // var data = new InterfaceStatistics()
-        // {
-        //     CreatedTime = eventData.CreatedTime,
-        //     Path = eventData.Path,
-        //     UserId = eventData.UserId,
-        //     Query = eventData.Query,
-        // };
-        //
-        // await fileDbContext.InterfaceStatistics.AddAsync(data);
-        //
-        // await fileDbContext.SaveChangesAsync();
+        var fileDbContext = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<FileDbContext>();
+
+        var data = new InterfaceStatistics()
+        {
+            CreatedTime = eventData.CreatedTime,
+            Path = eventData.Path,
+            UserId = eventData.UserId,
+            Query = eventData.Query,
+        };
+
+        await fileDbContext!.InterfaceStatistics.AddAsync(data);
+
+        await fileDbContext.SaveChangesAsync();
     }
 }

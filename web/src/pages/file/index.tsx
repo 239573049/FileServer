@@ -7,6 +7,8 @@ import { Input, List, Upload, message, Popconfirm, Modal, Button, Tooltip } from
 import './index.less'
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { change } from '@/utils/util'
+import * as signalR from "@microsoft/signalr";
+import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 import Editor from "@monaco-editor/react";
 
 import {
@@ -20,6 +22,17 @@ import CreateDirectory from '@/components/directory/create';
 import CreateFile from '@/components/file/create';
 import CreateRouteMapping from '@/components/routeMapping/create';
 import React from 'react';
+import { HubConnection } from '@microsoft/signalr';
+import { baseUrl } from '@/utils/request';
+
+var signalr = new signalR.HubConnectionBuilder()
+  .withUrl(process.env.NODE_ENV === "development" ? baseUrl + "/uploading" : "/uploading", { accessTokenFactory: () => window.localStorage.getItem("token") ?? "" })
+  .withAutomaticReconnect()
+  .withHubProtocol(new MessagePackHubProtocol())
+  .build();
+
+signalr.start();
+
 
 const { Dragger } = Upload;
 
@@ -102,8 +115,10 @@ class File extends Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state.createRoute.CreateRouteComponent = React.createRef();
+
     this.getListData()
+    this.state.createRoute.CreateRouteComponent = React.createRef();
+
     document.oncontextmenu = function (e) {
       return false
     }
@@ -324,15 +339,28 @@ class File extends Component<IProps, IState> {
   }
 
   beforeUpload(file: any) {
-    console.log(file);
-
-    fileApi.uploading(this.state.input.path, file, file.webkitRelativePath)
-      .then(res => {
-        if (res != undefined) {
-          message.success("成功上传文件")
-          this.getListData()
+    const subject = new signalR.Subject<Int8Array>();
+    console.log(signalr);
+    signalr!.send("UploadStream", this.state.input.path, file.webkitRelativePath, file.name, file.size, subject)
+      .then(() => {
+        var fr = new FileReader();
+        fr.readAsArrayBuffer(file);
+        if (fr) {
+          var len = file.size;
+          var size = 0;
+          fr.onload = function (x) {
+            while (len > 0) {
+              var buffer = fr.result?.slice(size, size + (1024 * 10)) as ArrayBuffer;
+              size += (1024 * 10);
+              len -= (1024 * 10);
+              console.log('onprogress', buffer);
+              subject.next(new Int8Array(buffer))
+            }
+            subject.complete();
+          };
         }
-      })
+      });
+
     return false;
   }
 

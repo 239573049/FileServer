@@ -4,14 +4,16 @@ import { history } from 'umi';
 
 const baseUrl = 'http://localhost:5293';
 const errorHandler = (error: any) => {
-  if (error.response.status === 401) {
+  console.log(error);
+
+  if (error?.response?.status === 401) {
     message.error(error.data.Message)
     history.push('/login');
     return;
   }
 
-  if (error.response.status !== 200) {
-    message.error(error.data.Message)
+  if (error?.response?.status !== 200) {
+    message?.error(error?.data?.Message)
   }
 };
 
@@ -39,6 +41,6 @@ request.interceptors.request.use((url: any, options: any) => {
 
 })
 
-
+export { baseUrl }
 
 export default request;

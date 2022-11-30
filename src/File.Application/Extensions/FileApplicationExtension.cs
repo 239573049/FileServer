@@ -40,7 +40,6 @@ public static class FileApplicationExtension
         {
             options.UseSqlite(connectString);
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
-
         });
 
         services.AddSingleton((service) =>
@@ -58,7 +57,8 @@ public static class FileApplicationExtension
         services.AddEventBus();
         services.AddTransient<FileMiddleware>();
 
-        services.AddTransient(typeof(ILoadEventHandler<InterfaceStatisticsEto>), typeof(InterfaceStatisticsEventHandle));
+        services.AddTransient(typeof(ILoadEventHandler<InterfaceStatisticsEto>),
+            typeof(InterfaceStatisticsEventHandle));
 
         services.AddTransient<InterfaceStatisticsMiddleware>();
     }
@@ -79,6 +79,21 @@ public static class FileApplicationExtension
                     ValidIssuer = tokenOption.Issuer, //签发者，签发的Token的人
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOption.SecretKey!)) // 密钥
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = (context) =>
+                    {
+                        // 添加signalr的token 因为signalr的token在请求头上所以需要设置
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.Value.StartsWith("/uploading"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
     }
 
@@ -94,16 +109,13 @@ public static class FileApplicationExtension
             var dbContext = services.BuildServiceProvider().GetService<FileDbContext>();
             var routes = new List<RouteMapping>();
             routes.AddRange(await dbContext!.RouteMappings.ToListAsync());
-            routes.ForEach(x =>
-            {
-                mappings.TryAdd(x.Route, x);
-            });
-
+            routes.ForEach(x => { mappings.TryAdd(x.Route, x); });
         }
         catch (Exception exception)
         {
             await Console.Error.WriteLineAsync(exception.Message);
         }
+
         services.AddSingleton(mappings);
     }
 

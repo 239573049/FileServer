@@ -23,7 +23,10 @@
     "@ant-design/charts": "^1.4.2",
     "@ant-design/pro-components": "^1.1.19",
     "@ant-design/pro-layout": "^6.5.0",
+    "@microsoft/signalr": "^7.0.0",
+    "@microsoft/signalr-protocol-msgpack": "^7.0.0",
     "@monaco-editor/react": "^4.4.6",
+    "@types/node": "^18.11.9",
     "react": "17.x",
     "react-dom": "17.x",
     "umi": "^3.5.35"

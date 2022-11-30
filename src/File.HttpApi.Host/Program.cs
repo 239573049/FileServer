@@ -17,6 +17,7 @@ using System.Text;
 using System.Text.Json;
 using File.Application.Contract.Statistics;
 using File.Application.Contract.Statistics.Input;
+using File.HttpApi.Host.Hubs;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -29,7 +30,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", corsBuilder =>
     {
-        corsBuilder.SetIsOriginAllowed((string _) => true).AllowAnyMethod().AllowAnyHeader()
+        corsBuilder.SetIsOriginAllowed((string _) => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
             .AllowCredentials();
     });
 });
@@ -43,6 +46,8 @@ builder.Services.Configure<TokenOptions>(configurationSection);
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddJwt(configurationSection.Get<TokenOptions>()!);
+builder.Services.AddSignalR()
+    .AddMessagePackProtocol();
 
 var app = builder.Build();
 
@@ -197,7 +202,6 @@ app.MapPost("/api/auth",
             signingCredentials: cred); // ÁîÅÆ
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     });
-
 app.MapGet("/api/user-info", (IUserInfoService userInfoService)
         => userInfoService.GetAsync())
     .RequireAuthorization();
@@ -220,5 +224,7 @@ app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType
 #endregion
 
 app.UseCors("CorsPolicy");
+
+app.MapHub<UploadingHub>("/uploading");
 
 await app.RunAsync();

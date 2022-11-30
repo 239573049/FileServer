@@ -124,6 +124,7 @@ class File extends Component<IProps, IState> {
     this.state.createRoute.CreateRouteComponent = React.createRef();
     signalr.on('upload', (message: UploadModule) => {
       var { uploadList } = this.state;
+      // 更新上传进度
       uploadList.forEach(x => {
         if (x.fileName === message.fileName) {
           x.uploadingProgress = message.uploadingProgress;
@@ -132,10 +133,10 @@ class File extends Component<IProps, IState> {
           return;
         }
       })
+      // 如果上传完成刷新列表
       if (message.complete) {
         this.getListData()
       }
-
     })
     document.oncontextmenu = function (e) {
       return false

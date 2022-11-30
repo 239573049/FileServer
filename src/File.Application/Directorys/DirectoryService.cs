@@ -1,4 +1,5 @@
-﻿using File.Application.Contract.Directorys;
+﻿using File.Application.Contract.Base;
+using File.Application.Contract.Directorys;
 using File.Shared;
 
 namespace File.Application.Directorys;
@@ -21,6 +22,10 @@ internal class DirectoryService : IDirectoryService
             var fileInfo = new FileInfo(fullName);
 
             fullName = fullName.TrimEnd(name.ToCharArray());
+            if (Path.Exists(Path.Combine(fullName, path)))
+            {
+                throw new BusinessException("已经存在相同文件");
+            }
             fileInfo.MoveTo(Path.Combine(fullName, path),false);
         }
         else
@@ -28,6 +33,10 @@ internal class DirectoryService : IDirectoryService
             var directoryInfo= new DirectoryInfo(fullName);
 
             fullName = fullName.TrimEnd(name.ToCharArray());
+            if (Path.Exists(Path.Combine(fullName, path)))
+            {
+                throw new BusinessException("已经存在相同文件夹");
+            }
             directoryInfo.MoveTo(Path.Combine(fullName, path));
         }
 

@@ -24,10 +24,12 @@ import CreateRouteMapping from '@/components/routeMapping/create';
 import React from 'react';
 import { HubConnection } from '@microsoft/signalr';
 import { baseUrl } from '@/utils/request';
+import { UploadModule, UploadState } from '@/module/uploadModule';
 
 var signalr = new signalR.HubConnectionBuilder()
   .withUrl(process.env.NODE_ENV === "development" ? baseUrl + "/uploading" : "/uploading", { accessTokenFactory: () => window.localStorage.getItem("token") ?? "" })
   .withAutomaticReconnect()
+  .configureLogging(signalR.LogLevel.Debug)
   .withHubProtocol(new MessagePackHubProtocol())
   .build();
 
@@ -63,7 +65,8 @@ interface IState {
     open: boolean,
     info: FilesListDto,
     CreateRouteComponent: any
-  }
+  },
+  uploadList: UploadModule[]
 }
 
 class File extends Component<IProps, IState> {
@@ -110,7 +113,8 @@ class File extends Component<IProps, IState> {
         fullName: null,
       },
       CreateRouteComponent: null
-    }
+    },
+    uploadList: []
   };
 
   constructor(props: IProps) {
@@ -118,7 +122,21 @@ class File extends Component<IProps, IState> {
 
     this.getListData()
     this.state.createRoute.CreateRouteComponent = React.createRef();
+    signalr.on('upload', (message: UploadModule) => {
+      var { uploadList } = this.state;
+      uploadList.forEach(x => {
+        if (x.fileName === message.fileName) {
+          x.uploadingProgress = message.uploadingProgress;
+          x.state = message.state;
+          x.complete = message.complete;
+          return;
+        }
+      })
+      if (message.complete) {
+        this.getListData()
+      }
 
+    })
     document.oncontextmenu = function (e) {
       return false
     }
@@ -215,6 +233,10 @@ class File extends Component<IProps, IState> {
     })
   }
 
+  /**
+   * 解压zip压缩包
+   * @param item 
+   */
   extractDirectory(item: FilesListDto) {
     fileApi.extractToDirectory(this.state.input.path, item.name!)
       .then(res => {
@@ -246,6 +268,11 @@ class File extends Component<IProps, IState> {
       </span>)
   }
 
+  /**
+   * 重命名dom
+   * @param item 
+   * @returns 
+   */
   getrename(item: FilesListDto) {
     var { rename } = this.state;
     return <Popconfirm
@@ -267,6 +294,10 @@ class File extends Component<IProps, IState> {
     </Popconfirm>
   }
 
+  /**
+   * 请求重命名
+   * @param item 
+   */
   renameOk(item: FilesListDto) {
     var { rename } = this.state;
     directoryApi.rename(item.fullName!, rename, item.name!)
@@ -280,6 +311,10 @@ class File extends Component<IProps, IState> {
     this.setState({ rename: '' })
   }
 
+  /**
+   * 设置路由配置
+   * @param item 
+   */
   setRoute(item: FilesListDto) {
     var { createRoute } = this.state
     createRoute.info = item;
@@ -322,6 +357,9 @@ class File extends Component<IProps, IState> {
     )
   }
 
+  /**
+   * 拉取列表数据
+   */
   getListData() {
     fileApi.getList(this.state.input)
       .then((res: any) => {
@@ -335,13 +373,31 @@ class File extends Component<IProps, IState> {
 
   onDrop(value: any) {
     console.log(value);
-
   }
 
+  /**
+   * 上传文件处理
+   * @param file 
+   * @returns 
+   */
   beforeUpload(file: any) {
+    var { uploadList } = this.state;
     const subject = new signalR.Subject<Int8Array>();
     console.log(signalr);
-    signalr!.send("UploadStream", this.state.input.path, file.webkitRelativePath, file.name, file.size, subject)
+    var upload = {
+      fileName: file.name,
+      uploadingProgress: 0,
+      complete: false,
+      state: UploadState.BeingProcessed,
+      message: '',
+    };
+
+    uploadList.push(upload)
+    this.setState({
+      uploadList
+    })
+
+    signalr!.send("UploadStream", this.state.input.path, file.webkitRelativePath, file.name, subject)
       .then(() => {
         var fr = new FileReader();
         fr.readAsArrayBuffer(file);
@@ -350,9 +406,9 @@ class File extends Component<IProps, IState> {
           var size = 0;
           fr.onload = function (x) {
             while (len > 0) {
-              var buffer = fr.result?.slice(size, size + (1024 * 10)) as ArrayBuffer;
-              size += (1024 * 10);
-              len -= (1024 * 10);
+              var buffer = fr.result?.slice(size, size + (1024 * 20)) as ArrayBuffer;
+              size += (1024 * 20);
+              len -= (1024 * 20);
               console.log('onprogress', buffer);
               subject.next(new Int8Array(buffer))
             }

@@ -47,6 +47,11 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddJwt(configurationSection.Get<TokenOptions>()!);
 builder.Services.AddSignalR()
+    .AddHubOptions<UploadingHub>(options =>
+    {
+        options.MaximumReceiveMessageSize = 1024 * 36;
+    })
+    .AddJsonProtocol()
     .AddMessagePackProtocol();
 
 var app = builder.Build();
@@ -92,7 +97,6 @@ app.Use(async (content, next) =>
 
 // ◊¢“‚ π”√À≥–Ú∑¿÷π¥ÌŒÛ
 app.UseFileApplication();
-
 app.UseStaticFiles();
 
 #region file

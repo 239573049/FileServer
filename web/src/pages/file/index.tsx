@@ -3,15 +3,13 @@ import { PagedResultDto } from '@/module/pagedResultDto';
 import { Component, ReactNode } from 'react';
 import fileApi from '../../apis/fileApi';
 import directoryApi from '../../apis/directoryApi'
-import { Input, List, Upload, message, Popconfirm, Modal, Button, Tooltip } from 'antd';
+import { Input, List, Upload, message, Popconfirm, Modal, Button, Tooltip, Progress, Card, Tag } from 'antd';
 import './index.less'
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { change } from '@/utils/util'
 import * as signalR from "@microsoft/signalr";
 import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 import Editor from "@monaco-editor/react";
-import { FloatButton } from 'antd';
-import { CustomerServiceOutlined, CommentOutlined } from '@ant-design/icons';
 
 
 import {
@@ -25,9 +23,8 @@ import CreateDirectory from '@/components/directory/create';
 import CreateFile from '@/components/file/create';
 import CreateRouteMapping from '@/components/routeMapping/create';
 import React from 'react';
-import { HubConnection } from '@microsoft/signalr';
 import { baseUrl } from '@/utils/request';
-import { UploadModule, UploadState } from '@/module/uploadModule';
+import { UploadModule } from '@/module/uploadModule';
 
 var signalr = new signalR.HubConnectionBuilder()
   .withUrl(process.env.NODE_ENV === "development" ? baseUrl + "/uploading" : "/uploading", { accessTokenFactory: () => window.localStorage.getItem("token") ?? "" })
@@ -69,6 +66,7 @@ interface IState {
     info: FilesListDto,
     CreateRouteComponent: any
   },
+  UploadShow: boolean,
   uploadList: UploadModule[]
 }
 
@@ -117,6 +115,7 @@ class File extends Component<IProps, IState> {
       },
       CreateRouteComponent: null
     },
+    UploadShow: false,
     uploadList: []
   };
 
@@ -125,20 +124,37 @@ class File extends Component<IProps, IState> {
 
     this.getListData()
     this.state.createRoute.CreateRouteComponent = React.createRef();
-    signalr.on('upload', (message: UploadModule) => {
-      var { uploadList } = this.state;
+    signalr.on('upload', (msg: UploadModule) => {
+      var { uploadList, UploadShow } = this.state;
       // 更新上传进度
-      uploadList.forEach(x => {
-        if (x.fileName === message.fileName) {
-          x.uploadingProgress = message.uploadingProgress;
-          x.state = message.state;
-          x.complete = message.complete;
-          return;
+      for (let i = 0; i < uploadList.length; i++) {
+        if (msg.fileName === uploadList[i].fileName) {
+          if (msg.complete) {
+            uploadList[i].uploadingProgress = uploadList[i].size;
+          } else {
+            uploadList[i].uploadingProgress = msg.uploadingProgress;
+          }
+          uploadList[i].state = msg.state;
+          uploadList[i].complete = msg.complete;
         }
-      })
+
+      }
       // 如果上传完成刷新列表
-      if (message.complete) {
+      if (msg.complete) {
+        message.success(msg.fileName + "上传成功😘")
         this.getListData()
+        this.setState({
+          uploadList: [...uploadList]
+        })
+      } else if (msg.complete && msg.state === "BeDefeated") {
+        message.error(msg.message)
+        this.setState({
+          uploadList: [...uploadList]
+        })
+      } else if (UploadShow) {
+        this.setState({
+          uploadList: [...uploadList]
+        })
       }
     })
     document.oncontextmenu = function (e) {
@@ -184,7 +200,7 @@ class File extends Component<IProps, IState> {
     }
   }
 
-  onDeleteFile(item: FilesListDto) {
+  deleteFile(item: FilesListDto) {
     if (item.fullName) {
       fileApi.deleteFile(item.fullName)
         .then((res) => {
@@ -259,7 +275,13 @@ class File extends Component<IProps, IState> {
   feature(item: FilesListDto) {
     return (
       <span>
-        <div className='file-delete' onClick={() => this.onDeleteFile(item)}>
+        <div className='file-delete' onClick={() => {
+          if (item.type === FileType.File) {
+            this.deleteFile(item)
+          } else {
+            this.deleteDirectory(item)
+          }
+        }}>
           删除
         </div>
         <div className='file-delete' onClick={() => this.setRoute(item)}>
@@ -391,13 +413,16 @@ class File extends Component<IProps, IState> {
       fileName: file.name,
       uploadingProgress: 0,
       complete: false,
-      state: UploadState.BeingProcessed,
+      size: file.size,
+      state: "BeingProcessed",
       message: '',
     };
 
     uploadList.push(upload)
+    console.log('uploadList', uploadList);
+
     this.setState({
-      uploadList
+      uploadList: uploadList
     })
 
     signalr!.send("UploadStream", this.state.input.path, file.webkitRelativePath, file.name, subject)
@@ -458,7 +483,7 @@ class File extends Component<IProps, IState> {
   }
 
   render(): ReactNode {
-    var { data, input, fileshow, file, fileContent, createRoute, edit, createDirectory, createFile } = this.state;
+    var { data, input, fileshow, file, fileContent, createRoute, edit, createDirectory, createFile, UploadShow, uploadList } = this.state;
     return (<div>
       <Dragger directory multiple showUploadList={false} {...this.props} beforeUpload={(file: any) => this.beforeUpload(file)} openFileDialogOnClick={false} className="dargg">
         <div style={{ marginBottom: "10px" }}>
@@ -472,6 +497,13 @@ class File extends Component<IProps, IState> {
           </Button>
           <Button onClick={() => this.createFile()} type="primary" style={{ float: "right", marginLeft: '5px' }}>
             添加文件
+          </Button>
+          <Button onClick={() => {
+            this.setState({
+              UploadShow: true
+            })
+          }} type="primary" style={{ float: "right", marginLeft: '5px' }}>
+            显示下载进度
           </Button>
         </div>
         <div>
@@ -538,10 +570,40 @@ class File extends Component<IProps, IState> {
         })
       }} />
       <CreateRouteMapping ref={createRoute.CreateRouteComponent} />
-      <FloatButton.Group icon={<CustomerServiceOutlined />} type="primary" trigger="click">
-        <FloatButton />
-        <FloatButton icon={<CommentOutlined />} />
-      </FloatButton.Group>
+
+      <Modal title="上传列表" open={UploadShow} onOk={() => {
+        this.setState({
+          UploadShow: false
+        })
+      }}
+        onCancel={() => {
+          this.setState({
+            UploadShow: false
+          })
+        }}>
+        <div style={{
+          overflow: "auto",
+          height: "500px",
+        }}>
+          {uploadList.map((x) => {
+            return (<Card title={x.fileName} style={{ width: '100%' }}>
+              {x.state === "BeDefeated" ?
+                <Tag icon={<CloseCircleOutlined />} color="error">
+                  上传失败
+                </Tag> : (x.state === "Complete" ? <Tag icon={<CheckCircleOutlined />} color="success">
+                  上传完成
+                </Tag> : <Tag icon={<SyncOutlined spin />} color="processing">
+                  上传中
+                </Tag>)}
+              <Progress
+                strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+                percent={parseInt(`${x.uploadingProgress / x.size * 100}`)}
+              />
+            </Card>)
+          })}
+        </div>
+
+      </Modal>
     </div>);
   }
 }

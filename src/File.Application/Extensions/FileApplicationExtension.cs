@@ -47,6 +47,7 @@ public static class FileApplicationExtension
             var options = new StatisticsOptions();
             options.IgnoreUri.Add("/api/statistics/pie");
             options.IgnoreUri.Add("/api/statistics/statistics");
+            options.IgnoreUri.Add("/api/file/list");
             options.IgnoreUri.Add("/api/auth");
             return options;
         });

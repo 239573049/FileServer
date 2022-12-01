@@ -11,6 +11,7 @@ namespace File.HttpApi.Host.Hubs;
 public class UploadingHub : Hub
 {
     private readonly ConcurrentDictionary<string, Guid> _concurrent = new();
+
     public override async Task OnConnectedAsync()
     {
         _concurrent.TryAdd(Context.ConnectionId, GetUserId());
@@ -23,18 +24,29 @@ public class UploadingHub : Hub
     {
         var isException = false;
         var filePath = Path.Combine(path, webkitRelativePath.TrimEnd(fileName.ToCharArray()));
+        if (!Directory.Exists(filePath))
+        {
+            Directory.CreateDirectory(filePath);
+        }
         await using var fileStream =
             System.IO.File.Open(Path.Combine(filePath, fileName), FileMode.Create, FileAccess.Write);
         try
         {
             var len = 0;
+            var size = 80;
             while (await stream.WaitToReadAsync())
             {
                 while (stream.TryRead(out var item))
                 {
-                    _ = Clients.Client(Context.ConnectionId).SendAsync("upload",
-                        new UploadModule(fileName, len, false, UploadState.BeingProcessed));
                     len += item.Length;
+                    size--;
+                    if (size == 0)
+                    {
+                        _ = Clients.Client(Context.ConnectionId).SendAsync("upload",
+                            new UploadModule(fileName, len, false, UploadState.BeingProcessed));
+                        size = 80;
+                    }
+
                     await fileStream.WriteAsync(item);
                 }
             }
@@ -71,6 +83,7 @@ public class UploadingHub : Hub
         {
             throw new BusinessException("未登录");
         }
+
         return Guid.Parse(value);
     }
 }

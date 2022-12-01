@@ -66,7 +66,7 @@ class CreateFile extends Component<IProps>{
                         language = "json"
                     } else if (input.name.endsWith(".bat")) {
                         language = "bat"
-                    } else if (input.name.endsWith(".Dockerfile")) {
+                    } else if (input.name.endsWith("Dockerfile")) {
                         language = "Dockerfile"
                     } else if (input.name.endsWith(".go")) {
                         language = "go"

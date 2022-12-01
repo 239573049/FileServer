@@ -1,13 +1,8 @@
 export interface UploadModule {
     fileName: string;
     uploadingProgress: number;
+    size: number,
     complete: boolean;
-    state: UploadState;
+    state: string;
     message: string;
-}
-
-export enum UploadState {
-    BeingProcessed,
-    Complete,
-    BeDefeated
 }

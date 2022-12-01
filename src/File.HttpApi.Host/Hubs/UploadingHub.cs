@@ -14,7 +14,7 @@ public class UploadingHub : Hub
     public override async Task OnConnectedAsync()
     {
         _concurrent.TryAdd(Context.ConnectionId, GetUserId());
-        
+
         await Task.CompletedTask;
     }
 
@@ -32,10 +32,10 @@ public class UploadingHub : Hub
             {
                 while (stream.TryRead(out var item))
                 {
+                    _ = Clients.Client(Context.ConnectionId).SendAsync("upload",
+                        new UploadModule(fileName, len, false, UploadState.BeingProcessed));
                     len += item.Length;
                     await fileStream.WriteAsync(item);
-                    await Clients.Client(Context.ConnectionId).SendAsync("upload",
-                        new UploadModule(fileName, len, false, UploadState.BeingProcessed));
                 }
             }
         }

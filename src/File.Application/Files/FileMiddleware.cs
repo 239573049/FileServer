@@ -2,6 +2,7 @@
 using File.Application.Contract.Base;
 using File.Application.Manage;
 using File.Entity;
+using File.Shared;
 using Microsoft.AspNetCore.Http;
 
 namespace File.Application.Files;
@@ -28,11 +29,20 @@ public class FileMiddleware : IMiddleware
                 throw new BusinessException("没有权限返回静态文件", 403);
             }
 
-            var path = value.Value.Path.Replace(context.Request.Path.Value, value.Value.Path);
+            string path;
+            if (value.Value.Type == FileType.File)
+            {
+                path = value.Value.Path;
+            }
+            else
+            {
+                path = context.Request.Path.Value.Replace(value.Value.Route, value.Value.Path);
+            }
+            Console.WriteLine("访问静态路径"+path);
             if (System.IO.File.Exists(path))
             {
                 context.Response.StatusCode = 200;
-                var contentType = FileContentTypes.FirstOrDefault(x => context.Request.Path.Value.EndsWith(x.Key));
+                var contentType = FileContentTypes.FirstOrDefault(x => value.Value.Path.EndsWith(x.Key));
 
                 if (contentType.Key != null)
                 {
@@ -45,6 +55,7 @@ public class FileMiddleware : IMiddleware
 
                 await using var fileStream = System.IO.File.OpenRead(path);
 
+                context.Response.ContentLength = fileStream.Length;
                 await fileStream.CopyToAsync(context.Response.Body);
             }
         }
@@ -68,5 +79,8 @@ public class FileMiddleware : IMiddleware
         FileContentTypes.Add(".jpg", "image/jpeg");
         FileContentTypes.Add(".png", "image/png");
         FileContentTypes.Add(".pdf", "application/pdf");
+        FileContentTypes.Add(".mp4", "video/mpeg4");
+        FileContentTypes.Add(".htx", "text/html");
+        FileContentTypes.Add(".tif", "image/tiff");
     }
 }

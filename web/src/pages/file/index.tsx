@@ -595,6 +595,7 @@ class File extends Component<IProps, IState> {
                 </Tag> : <Tag icon={<SyncOutlined spin />} color="processing">
                   上传中
                 </Tag>)}
+              <Tag>{change(x.uploadingProgress) + "/" + change(x.size)}</Tag>
               <Progress
                 strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
                 percent={parseInt(`${x.uploadingProgress / x.size * 100}`)}

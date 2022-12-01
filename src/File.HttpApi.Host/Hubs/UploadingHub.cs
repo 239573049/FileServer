@@ -66,7 +66,7 @@ public class UploadingHub : Hub
 
     private Guid GetUserId()
     {
-        var value = Context.User.Claims.FirstOrDefault(x => x.Type == "Id").Value;
+        var value = Context.User?.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         if (value.IsNullOrEmpty())
         {
             throw new BusinessException("未登录");

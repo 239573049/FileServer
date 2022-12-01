@@ -209,7 +209,6 @@ app.MapPost("/api/auth",
 app.MapGet("/api/user-info", (IUserInfoService userInfoService)
         => userInfoService.GetAsync())
     .RequireAuthorization();
-;
 
 #endregion
 
@@ -218,12 +217,12 @@ app.MapGet("/api/user-info", (IUserInfoService userInfoService)
 app.MapGet("/api/statistics/statistics", (IStatisticsService statisticsService)
         => statisticsService.GetStatisticsAsync())
     .RequireAuthorization();
-;
+
 
 app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType type)
         => statisticsService.GetPieAsync(new PieInput() { Type = type }))
     .RequireAuthorization();
-;
+
 
 #endregion
 

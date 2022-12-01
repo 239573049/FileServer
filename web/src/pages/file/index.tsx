@@ -10,6 +10,9 @@ import { change } from '@/utils/util'
 import * as signalR from "@microsoft/signalr";
 import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 import Editor from "@monaco-editor/react";
+import { FloatButton } from 'antd';
+import { CustomerServiceOutlined, CommentOutlined } from '@ant-design/icons';
+
 
 import {
   FolderOpenOutlined,
@@ -384,7 +387,6 @@ class File extends Component<IProps, IState> {
   beforeUpload(file: any) {
     var { uploadList } = this.state;
     const subject = new signalR.Subject<Int8Array>();
-    console.log(signalr);
     var upload = {
       fileName: file.name,
       uploadingProgress: 0,
@@ -410,9 +412,9 @@ class File extends Component<IProps, IState> {
               var buffer = fr.result?.slice(size, size + (1024 * 20)) as ArrayBuffer;
               size += (1024 * 20);
               len -= (1024 * 20);
-              console.log('onprogress', buffer);
               subject.next(new Int8Array(buffer))
             }
+            console.log('complete');
             subject.complete();
           };
         }
@@ -536,6 +538,10 @@ class File extends Component<IProps, IState> {
         })
       }} />
       <CreateRouteMapping ref={createRoute.CreateRouteComponent} />
+      <FloatButton.Group icon={<CustomerServiceOutlined />} type="primary" trigger="click">
+        <FloatButton />
+        <FloatButton icon={<CommentOutlined />} />
+      </FloatButton.Group>
     </div>);
   }
 }

@@ -115,6 +115,11 @@ public class FileService : IFileService
     /// <inheritdoc />
     public async Task CreateAsync(CreateFileInput input)
     {
+        if (string.IsNullOrEmpty(input.Name))
+        {
+            throw new BusinessException("目录名称不能为空");
+        }
+        
         var fileName = Path.Combine(input.Path, input.Name);
         if (!Directory.Exists(input.Path))
         {
@@ -126,7 +131,7 @@ public class FileService : IFileService
             throw new BusinessException("文件名重复");
         }
 
-        using var fileStream = System.IO.File.Create(fileName);
+        await using var fileStream = System.IO.File.Create(fileName);
 
         if (!string.IsNullOrEmpty(input.Content))
         {

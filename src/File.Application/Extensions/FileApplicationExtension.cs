@@ -60,7 +60,9 @@ public static class FileApplicationExtension
 
         services.AddTransient(typeof(ILoadEventHandler<InterfaceStatisticsEto>),
             typeof(InterfaceStatisticsEventHandle));
-
+        services.AddTransient(typeof(ILoadEventHandler<DeleteFileEto>),
+            typeof(DeleteFileHandle));
+        
         services.AddTransient<InterfaceStatisticsMiddleware>();
     }
 

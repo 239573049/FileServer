@@ -1,12 +1,21 @@
 ﻿using File.Application.Contract.Base;
 using File.Application.Contract.Directorys;
+using File.Application.Contract.Eto;
 using File.Shared;
 using Microsoft.IdentityModel.Tokens;
+using Token.Events;
 
 namespace File.Application.Directorys;
 
 internal class DirectoryService : IDirectoryService
 {
+    private readonly ILoadEventBus<DeleteFileEto> _loadEventBus;
+
+    public DirectoryService(ILoadEventBus<DeleteFileEto> loadEventBus)
+    {
+        _loadEventBus = loadEventBus;
+    }
+
     public async Task CreateAsync(string path,string name)
     {
         if (name.IsNullOrEmpty())
@@ -56,6 +65,8 @@ internal class DirectoryService : IDirectoryService
 
     public async Task DeleteAsync(string path)
     {
+        await _loadEventBus.PushAsync(new DeleteFileEto(path));
+        
         Directory.Delete(path,true);
      
         await Task.CompletedTask;

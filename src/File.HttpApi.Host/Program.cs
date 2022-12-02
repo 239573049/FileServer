@@ -223,6 +223,10 @@ app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType
         => statisticsService.GetPieAsync(new PieInput() { Type = type }))
     .RequireAuthorization();
 
+app.MapGet("/demo", (IDirectoryService directoryService) =>
+{
+    directoryService.GetDemo();
+});
 
 #endregion
 

@@ -13,12 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "File.Application", "src\Fil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resource", "resource", "{0A0AFEE5-BBDA-4773-8EBE-548EB06267E4}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "File.Entity", "src\File.Entity\File.Entity.csproj", "{371BFDFF-466C-48D2-BFFD-60CFBBBF03F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "File.Entity", "src\File.Entity\File.Entity.csproj", "{371BFDFF-466C-48D2-BFFD-60CFBBBF03F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "File.Shared", "src\File.Shared\File.Shared.csproj", "{D8517647-7AE0-4CEA-8854-87289FDED5F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "File.Shared", "src\File.Shared\File.Shared.csproj", "{D8517647-7AE0-4CEA-8854-87289FDED5F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

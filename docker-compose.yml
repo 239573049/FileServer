@@ -1,0 +1,16 @@
+
+services:
+  file-server:
+    build:
+      context: .
+      dockerfile: ./src/File.HttpApi.Host/Dockerfile
+    container_name: file-server
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+  
+  file-web:
+    build:
+      context: .
+      dockerfile: ./web/Dockerfile
+    container_name: file-web
+    

@@ -9,7 +9,7 @@ public class FileDbContext : DbContext
 
     public required DbSet<RouteMapping> RouteMappings { get; set; }
 
-    public required DbSet<Entity.InterfaceStatistics> InterfaceStatistics { get; set; }
+    public required DbSet<InterfaceStatistics> InterfaceStatistics { get; set; }
     
     public FileDbContext(DbContextOptions options) : base(options)
     {

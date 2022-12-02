@@ -26,4 +26,6 @@ public interface IDirectoryService
     /// <param name="name">原名称</param>
     /// <returns></returns>
     Task RenameAsync(string fullName, string path, string name);
+
+    Task GetDemo();
 }

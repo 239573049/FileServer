@@ -16,8 +16,8 @@ import {
   FolderOpenOutlined,
   FileOutlined
 } from '@ant-design/icons';
-import { GetListInput } from '@/module/getListInput';
-import { SaveFileContentInput } from '@/module/saveFileContentInput';
+import { GetListInput } from '@/module/input/getListInput';
+import { SaveFileContentInput } from '@/module/input/saveFileContentInput';
 import { FileContentDto } from '@/module/fileContentDto';
 import CreateDirectory from '@/components/directory/create';
 import CreateFile from '@/components/file/create';

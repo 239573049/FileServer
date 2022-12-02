@@ -19,6 +19,12 @@ const routes = {
           icon: <UserOutlined />,
           component: '@/pages/file/index',
         },
+        {
+          name: '访问记录',
+          path: '/visit',
+          icon: <UserOutlined />,
+          component: '@/pages/visit/index',
+        }
       ],
     },
   ],

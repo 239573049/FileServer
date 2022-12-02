@@ -20,7 +20,7 @@ public class CreateRouteMappingInput
     public FileType Type { get; set; }
 
     /// <summary>
-    /// 是否允许其他人访问
+    /// 如果密码不为空则设置了访问密码
     /// </summary>
-    public bool Visitor { get; set; }
+    public string? Password { get; set; }
 }

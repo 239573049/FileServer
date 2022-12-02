@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react";
 import { Modal, Input, message } from 'antd';
-import { GetListInput } from "@/module/getListInput";
+import { GetListInput } from "@/module/input/getListInput";
 import directoryApi from '../../apis/directoryApi'
 
 interface IProps {

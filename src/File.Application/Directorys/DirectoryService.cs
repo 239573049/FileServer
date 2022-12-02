@@ -65,30 +65,11 @@ internal class DirectoryService : IDirectoryService
         await Task.CompletedTask;
     }
 
-    public async Task GetDemo()
-    {
-        try
-        {
-            foreach (DriveInfo drive in DriveInfo.GetDrives())
-            {
-                //判断是否是固定磁盘
-                if (drive.DriveType == DriveType.Fixed)
-                {
-                    long total = drive.TotalSize / 1024 * 1024 * 1024;
-                    long free = drive.TotalFreeSpace / 1024 * 1024 * 1024;
-                    var s = drive.Name + ": 总空间=" + total + " G 剩余空间=" + free + " G\r\n";
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+    /// <inheritdoc />
+    public Task<IEnumerable<DriveInfo>> GetDrives()
+        => Task.FromResult(DriveInfo.GetDrives().Where(x => x.DriveType == DriveType.Fixed));
 
-        await Task.CompletedTask;
-    }
-
+    /// <inheritdoc />
     public async Task DeleteAsync(string path)
     {
         await _loadEventBus.PushAsync(new DeleteFileEto(path));

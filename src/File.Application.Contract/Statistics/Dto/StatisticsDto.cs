@@ -3,6 +3,11 @@
 public class StatisticsDto
 {
     /// <summary>
+    /// 今天访问量
+    /// </summary>
+    public int Today { get; set; }
+
+    /// <summary>
     /// 昨天访问量
     /// </summary>
     public int Yesterday { get; set; }

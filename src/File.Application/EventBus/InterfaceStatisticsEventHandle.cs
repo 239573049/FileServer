@@ -19,6 +19,7 @@ public class InterfaceStatisticsEventHandle : ILoadEventHandler<InterfaceStatist
 
     public async Task HandleEventAsync(InterfaceStatisticsEto eventData)
     {
+        // TODO: 由于Token.EventBus的消息队列处理器是单例 在单例中创建的服务是无法获取到域的DbContext响应通过 IServiceScopeFactory创建这个域的ServiceProvider才能获取到DbContext
         var fileDbContext = _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<FileDbContext>();
 
         var data = new InterfaceStatistics()
@@ -27,6 +28,9 @@ public class InterfaceStatisticsEventHandle : ILoadEventHandler<InterfaceStatist
             Path = eventData.Path,
             UserId = eventData.UserId,
             Query = eventData.Query,
+            Code = eventData.Code,
+            ResponseTime = eventData.ResponseTime,
+            Succeed = eventData.Succeed
         };
 
         await fileDbContext!.InterfaceStatistics.AddAsync(data);

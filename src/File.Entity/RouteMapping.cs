@@ -20,17 +20,17 @@ public class RouteMapping
     /// 类型
     /// </summary>
     public FileType Type { get; set; }
-
-    /// <summary>
-    /// 是否允许其他人访问
-    /// </summary>
-    public bool Visitor { get; set; }
-
+    
     /// <summary>
     /// 创建人
     /// </summary>
     public Guid CreateUserInfoId { get; set; }
-    
+
+    /// <summary>
+    /// 如果密码不为空则设置了访问密码
+    /// </summary>
+    public string? Password { get; set; }
+
     public virtual UserInfo CreateUserInfo { get; set; }
 
     protected RouteMapping()
@@ -38,12 +38,12 @@ public class RouteMapping
         
     }
     
-    public RouteMapping(string route, string path, FileType type, bool visitor, Guid createUserInfoId)
+    public RouteMapping(string route, string path, FileType type, string? password, Guid createUserInfoId)
     {
         Route = route;
         Path = path;
         Type = type;
-        Visitor = visitor;
+        Password = password;
         CreateUserInfoId = createUserInfoId;
     }
 }

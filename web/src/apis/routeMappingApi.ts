@@ -1,7 +1,7 @@
-import { CreateFileInput } from '@/module/createFileInput';
-import { CreateRouteMappingInput } from '@/module/createRouteMappingInput';
-import { GetListInput } from '@/module/getListInput';
-import { SaveFileContentInput } from '@/module/saveFileContentInput';
+import { CreateFileInput } from '@/module/input/createFileInput';
+import { CreateRouteMappingInput } from '@/module/input/createRouteMappingInput';
+import { GetListInput } from '@/module/input/getListInput';
+import { SaveFileContentInput } from '@/module/input/saveFileContentInput';
 import request from '@/utils/request';
 
 const api = '/api/route-mapping';

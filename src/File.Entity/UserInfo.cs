@@ -19,17 +19,22 @@
         /// </summary>
         public string Avatar  { get; set; }
 
-        public UserInfo(string username, string password, string avatar)
+        /// <summary>
+        /// 角色
+        /// </summary>
+        public string Role { get; set; }
+
+        public UserInfo(string username, string password, string avatar, string role)
         {
             Id=Guid.NewGuid();
             Username = username;
             Password = password;
             Avatar = avatar;
+            Role = role;
         }
 
         protected UserInfo()
         {
-            
         }
     }
 }

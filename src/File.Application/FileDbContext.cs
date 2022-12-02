@@ -1,4 +1,5 @@
 ﻿using File.Entity;
+using File.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace File.Application;
@@ -26,7 +27,6 @@ public class FileDbContext : DbContext
             u.HasKey(x => x.Id);
             u.HasIndex(x => x.Username).IsUnique();
 
-
             u.Property(x => x.Username).HasComment("用户名（唯一）");
             u.Property(x => x.Password).HasComment("密码");
             u.Property(x => x.Avatar).HasComment("头像");
@@ -42,7 +42,7 @@ public class FileDbContext : DbContext
             x.HasIndex(x => x.CreateUserInfoId);
 
             x.Property(x => x.Path).HasComment("绝对路径");
-            x.Property(x => x.Visitor).HasComment("是否同意他人访问");
+            x.Property(x => x.Password).HasComment("访问密码");
             x.Property(x => x.Route).HasComment("路由");
             x.Property(x => x.Type).HasComment("地址类型");
             x.Property(x => x.CreateUserInfoId).HasComment("创建人");
@@ -54,16 +54,17 @@ public class FileDbContext : DbContext
 
             x.HasIndex(x => x.Id).IsUnique();
             x.HasIndex(x => x.UserId);
+            x.HasIndex(x => x.CreatedTime);
 
             x.Property(x => x.UserId).HasComment("具体访问人id");
             x.Property(x => x.CreatedTime).HasComment("访问时间");
             x.Property(x => x.Query).HasComment("访问时携带的参数");
+            x.Property(x => x.Code).HasComment("响应状态码");
 
         });
 
-        var userInfo = new UserInfo("admin","Aa123456.","https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png");
+        var userInfo = new UserInfo("admin","Aa123456.","https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", RoleConstant.Admin);
 
         builder.Entity<UserInfo>().HasData(userInfo);
-        
     }
 }

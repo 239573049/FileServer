@@ -152,15 +152,24 @@ app.MapPost("/api/file/uploading", async (string path, string name, [FromForm] I
 
 app.MapDelete("/api/directory", (IDirectoryService directoryService, string path)
         => directoryService.DeleteAsync(path))
-    .RequireAuthorization();
+    .RequireAuthorization()
+    .WithDescription("删除文件夹");
 
 app.MapPost("/api/directory", (IDirectoryService directoryService, string path, string name)
         => directoryService.CreateAsync(path, name))
-    .RequireAuthorization();
+    .RequireAuthorization()
+    .WithDescription("添加文件夹名称");
 
 app.MapPut("/api/directory/rename", (IDirectoryService directoryService, string fullName, string path, string name)
         => directoryService.RenameAsync(fullName, path, name))
-    .RequireAuthorization();
+    .RequireAuthorization()
+    .WithDescription("修改文件夹名称");
+
+
+app.MapGet("/api/directory/drives", (IDirectoryService directoryService)
+    => directoryService.GetDrives())
+    .RequireAuthorization()
+    .WithDescription("获取硬盘列表");
 
 #endregion
 
@@ -216,17 +225,19 @@ app.MapGet("/api/user-info", (IUserInfoService userInfoService)
 
 app.MapGet("/api/statistics/statistics", (IStatisticsService statisticsService)
         => statisticsService.GetStatisticsAsync())
-    .RequireAuthorization();
+    .RequireAuthorization()
+    .WithDescription("获取统计");
 
 
 app.MapGet("/api/statistics/pie", (IStatisticsService statisticsService, PieType type)
         => statisticsService.GetPieAsync(new PieInput() { Type = type }))
-    .RequireAuthorization();
+    .RequireAuthorization()
+    .WithDescription("获取统计饼图");
 
-app.MapGet("/demo", (IDirectoryService directoryService) =>
-{
-    directoryService.GetDemo();
-});
+app.MapGet("/api/statistics/list", (IStatisticsService statisticsService, string keywords, int page, int pageSize)
+    => statisticsService.GetListAsync(new GetStatisticsInput(keywords, page, pageSize)))
+    .RequireAuthorization()
+    .WithDescription("获取访问列表");
 
 #endregion
 

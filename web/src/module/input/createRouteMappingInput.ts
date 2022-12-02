@@ -1,4 +1,4 @@
-import { FileType } from "./filesListDto";
+import { FileType } from "../filesListDto";
 
 export interface CreateRouteMappingInput {
     route: string;

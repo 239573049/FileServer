@@ -1,5 +1,4 @@
 import { defineConfig } from 'umi';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 
 export default defineConfig({
   nodeModulesTransform: {
@@ -25,6 +24,11 @@ export default defineConfig({
           name: '文件管理',
           path: '/file',
           component: '@/pages/file/index',
+        },
+        {
+          name: '访问记录',
+          path: '/visit',
+          component: '@/pages/visit/index',
         },
       ],
     },

@@ -7,6 +7,7 @@ using System.Text;
 using File.Application.Contract.Eto;
 using File.Shared;
 using Token.Events;
+using File.Application.Migrations;
 
 namespace File.Application.Files;
 
@@ -24,36 +25,30 @@ public class FileService : IFileService
     {
         try
         {
-            var list = new List<FilesListDto>();
             var directories = Directory.GetDirectories(input.Path, input.Name);
-            foreach (var directory in directories)
-            {
-                var directoryInfo = new DirectoryInfo(directory);
-                list.Add(new FilesListDto()
+            var list = directories.Select(directory => new DirectoryInfo(directory))
+                .Select(directoryInfo => new FilesListDto()
                 {
                     Name = directoryInfo.Name,
                     CreatedTime = directoryInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
                     Type = FileType.Directory,
                     FullName = directoryInfo.FullName.Replace("\\", "/"),
                     UpdateTime = directoryInfo.LastWriteTime,
-                });
-            }
+                })
+                .ToList();
 
             var files = Directory.GetFiles(input.Path, input.Name);
-            foreach (var file in files)
+            list.AddRange(files.Select(file => new FileInfo(file))
+            .Select(fileInfo => new FilesListDto()
             {
-                var fileInfo = new FileInfo(file);
-                list.Add(new FilesListDto()
-                {
-                    Name = fileInfo.Name,
-                    CreatedTime = fileInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    FileType = "文件",
-                    Length = fileInfo.Length,
-                    FullName = fileInfo.FullName.Replace("\\","/"),
-                    Type = FileType.File,
-                    UpdateTime = fileInfo.LastWriteTime,
-                });
-            }
+                Name = fileInfo.Name,
+                CreatedTime = fileInfo.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                FileType = "文件",
+                Length = fileInfo.Length,
+                FullName = fileInfo.FullName.Replace("\\", "/"),
+                Type = FileType.File,
+                UpdateTime = fileInfo.LastWriteTime,
+            }));
 
             return Task.FromResult(new PagedResultDto<FilesListDto>(list.Count, list));
         }
@@ -75,7 +70,7 @@ public class FileService : IFileService
         {
             await using var file = System.IO.File.OpenRead(filePath);
 
-            if (file.Length > (1024 * 1024) * 4)
+            if (file.Length > 5242880)
             {
                 throw new BusinessException("文件大于4MB无法读取");
             }
@@ -101,7 +96,7 @@ public class FileService : IFileService
 
         try
         {
-            using var fileStream = System.IO.File.OpenWrite(input.FilePath);
+            await using var fileStream = System.IO.File.OpenWrite(input.FilePath);
             fileStream.Position = 0;
             await fileStream.WriteAsync(Encoding.UTF8.GetBytes(input.Content));
             await fileStream.FlushAsync();
@@ -109,7 +104,6 @@ public class FileService : IFileService
         }
         catch (Exception)
         {
-
             throw;
         }
     }
@@ -117,6 +111,11 @@ public class FileService : IFileService
     /// <inheritdoc />
     public async Task DeleteFileAsync(string path)
     {
+        if (!System.IO.File.Exists(path))
+        {
+            throw new BusinessException("文件不存在");
+        }
+
         await _loadEventBus.PushAsync(new DeleteFileEto(path));
         
         System.IO.File.Delete(path);

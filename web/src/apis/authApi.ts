@@ -1,4 +1,4 @@
-import { AuthInput } from '@/module/authInput';
+import { AuthInput } from '@/module/input/authInput';
 import request from '@/utils/request';
 
 const api = '/api/auth';

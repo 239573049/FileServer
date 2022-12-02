@@ -45,30 +45,7 @@ class Index extends Component<IProps, IState> {
     },
     YesterdayConfig: {
       appendPadding: 10,
-      data: [{
-        type: '分类一',
-        value: 27,
-      },
-      {
-        type: '分类二',
-        value: 25,
-      },
-      {
-        type: '分类三',
-        value: 18,
-      },
-      {
-        type: '分类四',
-        value: 15,
-      },
-      {
-        type: '分类五',
-        value: 10,
-      },
-      {
-        type: '其他',
-        value: 5,
-      }],
+      data: [],
       angleField: 'value',
       colorField: 'type',
       radius: 0.75,
@@ -88,30 +65,7 @@ class Index extends Component<IProps, IState> {
     },
     MonthConfig: {
       appendPadding: 10,
-      data: [{
-        type: '分类一',
-        value: 27,
-      },
-      {
-        type: '分类二',
-        value: 25,
-      },
-      {
-        type: '分类三',
-        value: 18,
-      },
-      {
-        type: '分类四',
-        value: 15,
-      },
-      {
-        type: '分类五',
-        value: 10,
-      },
-      {
-        type: '其他',
-        value: 5,
-      }],
+      data: [],
       angleField: 'value',
       colorField: 'type',
       radius: 0.75,
@@ -131,30 +85,7 @@ class Index extends Component<IProps, IState> {
     },
     TotalConfig: {
       appendPadding: 10,
-      data: [{
-        type: '分类一',
-        value: 27,
-      },
-      {
-        type: '分类二',
-        value: 25,
-      },
-      {
-        type: '分类三',
-        value: 18,
-      },
-      {
-        type: '分类四',
-        value: 15,
-      },
-      {
-        type: '分类五',
-        value: 10,
-      },
-      {
-        type: '其他',
-        value: 5,
-      }],
+      data: [],
       angleField: 'value',
       colorField: 'type',
       radius: 0.75,
@@ -243,7 +174,7 @@ class Index extends Component<IProps, IState> {
       }}
     >
       <ProCard
-        title="浏览分析"
+        title="访问数据分析"
         bordered
         headerBordered
         split={responsive ? 'horizontal' : 'vertical'}
@@ -251,6 +182,7 @@ class Index extends Component<IProps, IState> {
         <ProCard split="horizontal">
           <ProCard split="horizontal">
             <ProCard split={responsive ? 'horizontal' : 'vertical'}>
+              <ProCard title="今日访问量">{statistics?.today}</ProCard>
               <ProCard title="昨天访问量">{statistics?.yesterday}</ProCard>
               <ProCard title="上星期访问量">{statistics?.lastWeek}</ProCard>
               <ProCard title="访问总量">{statistics?.total}</ProCard>

@@ -4,6 +4,7 @@ using File.Application.Manage;
 using File.Entity;
 using File.Shared;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 
 namespace File.Application.Files;
 
@@ -24,9 +25,16 @@ public class FileMiddleware : IMiddleware
         var value = _routeMappings.FirstOrDefault(x => context.Request.Path.Value.StartsWith(x.Key));
         if (value.Key != null)
         {
-            if (!value.Value.Visitor && _currentManage.IsAuthenticated() == false)
+            // 然后设置了密码则进入
+            if (!value.Value.Password.IsNullOrEmpty())
             {
-                throw new BusinessException("没有权限返回静态文件", 403);
+                // 获取密码
+                var token = context.Request.Query.FirstOrDefault(x => x.Key.ToLower() == "token").Value.ToString();
+                // 对比如果获取的密码是空的或者获取的密码和设置的不一致将抛出异常 
+                if (token == null || token != value.Value.Password)
+                {
+                    throw new BusinessException("访问失败，没有权限访问", 403);
+                }
             }
 
             string path;
@@ -38,7 +46,7 @@ public class FileMiddleware : IMiddleware
             {
                 path = context.Request.Path.Value.Replace(value.Value.Route, value.Value.Path);
             }
-            Console.WriteLine("访问静态路径"+path);
+
             if (System.IO.File.Exists(path))
             {
                 context.Response.StatusCode = 200;

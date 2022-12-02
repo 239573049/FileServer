@@ -1,6 +1,6 @@
 import { Component, ReactNode } from "react";
 import { Modal, Input, message, Mentions } from 'antd';
-import { GetListInput } from "@/module/getListInput";
+import { GetListInput } from "@/module/input/getListInput";
 import fileApi from '../../apis/fileApi'
 import Editor from "@monaco-editor/react";
 

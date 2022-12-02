@@ -4,7 +4,7 @@ namespace File.Application.Contract.Base
 {
     public class PagedResultDto<T>
     {
-        public List<T> Items { get; set; }
+        public IEnumerable<T> Items { get; set; }
 
         public int TotalCount { get; set; }
 
@@ -13,7 +13,7 @@ namespace File.Application.Contract.Base
             Items = new List<T>();
         }
 
-        public PagedResultDto(int totalCount, List<T> items)
+        public PagedResultDto(int totalCount, IEnumerable<T> items)
         {
             TotalCount = totalCount;
             Items = items;

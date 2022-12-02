@@ -1,4 +1,5 @@
-import { PieInput } from '@/module/pieInput';
+import { GetStatisticsInput } from '@/module/input/getStatisticsInput';
+import { PieInput } from '@/module/input/pieInput';
 import request from '@/utils/request';
 
 const api = '/api/statistics';
@@ -19,6 +20,17 @@ class statisticsApi {
      */
     getpie(type: PieInput) {
         return request.get(api + "/pie", { params: type })
+    }
+
+    /**
+     * 获取访问列表
+     * @param input 
+     * @returns 
+     */
+    getList(input: GetStatisticsInput) {
+        return request.get(api + '/list', {
+            params: input
+        })
     }
 }
 export default new statisticsApi();

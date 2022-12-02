@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace File.Application.Contract.Directorys;
 
@@ -27,5 +29,5 @@ public interface IDirectoryService
     /// <returns></returns>
     Task RenameAsync(string fullName, string path, string name);
 
-    Task GetDemo();
+    Task<IEnumerable<DriveInfo>> GetDrives();
 }

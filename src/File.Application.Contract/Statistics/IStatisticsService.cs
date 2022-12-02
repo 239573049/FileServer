@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using File.Application.Contract.Statistics.Dto;
 using System.Threading.Tasks;
+using File.Application.Contract.Base;
 using File.Application.Contract.Statistics.Input;
 
 namespace File.Application.Contract.Statistics;
@@ -18,4 +19,10 @@ public interface IStatisticsService
     /// </summary>
     /// <returns></returns>
     Task<List<PieDto>> GetPieAsync(PieInput input);
+
+    /// <summary>
+    /// 获取访问列表
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedResultDto<GetStatisticsDto>> GetListAsync(GetStatisticsInput input);
 }

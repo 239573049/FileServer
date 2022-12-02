@@ -2,6 +2,7 @@
 using File.Application.Manage;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
+using System.Text.Json;
 using Token.Events;
 
 namespace File.Application.Statistics;
@@ -28,8 +29,7 @@ public class InterfaceStatisticsMiddleware : IMiddleware
         var sw = Stopwatch.StartNew();
         await next.Invoke(context);
         sw.Stop();
-
-        await _loadEventBus.PushAsync(new InterfaceStatisticsEto()
+        var data = new InterfaceStatisticsEto()
         {
             CreatedTime = DateTime.Now,
             Path = context.Request.Path,
@@ -38,6 +38,9 @@ public class InterfaceStatisticsMiddleware : IMiddleware
             ResponseTime = sw.ElapsedMilliseconds,
             Query = context.Request.QueryString.Value ?? "",
             UserId = _currentManage.UserId()
-        });
+        };
+        await _loadEventBus.PushAsync(data);
+        
+        Console.WriteLine(JsonSerializer.Serialize(data));
     }
 }

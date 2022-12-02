@@ -4,42 +4,42 @@ namespace File.HttpApi.Host.Module;
 
 public class UploadModule
 {
-    public string FileName { get; set; }
+    public string fileName { get; set; }
 
     /// <summary>
     /// 当前进度
     /// </summary>
-    public long UploadingProgress { get; set; }
+    public long uploadingProgress { get; set; }
 
     /// <summary>
     /// 是否完成
     /// </summary>
-    public bool Complete { get; set; }
+    public bool complete { get; set; }
 
     /// <summary>
     /// 状态
     /// </summary>
-    public UploadState State { get; set; }
+    public UploadState state { get; set; }
     
     /// <summary>
     /// 如果发生异常传输异常信息
     /// </summary>
-    public string Message { get; set; }
+    public string message { get; set; }
 
     public UploadModule(string fileName, long uploadingProgress, bool complete, UploadState state)
     {
-        FileName = fileName;
-        UploadingProgress = uploadingProgress;
-        Complete = complete;
-        State = state;
+        this.fileName = fileName;
+        this.uploadingProgress = uploadingProgress;
+        this.complete = complete;
+        this.state = state;
     }
 
     public UploadModule(string fileName, long uploadingProgress, bool complete, UploadState state, string message)
     {
-        FileName = fileName;
-        UploadingProgress = uploadingProgress;
-        Complete = complete;
-        State = state;
-        Message = message;
+        this.fileName = fileName;
+        this.uploadingProgress = uploadingProgress;
+        this.complete = complete;
+        this.state = state;
+        this.message = message;
     }
 }

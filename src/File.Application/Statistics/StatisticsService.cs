@@ -78,7 +78,7 @@ public class StatisticsService : IStatisticsService
                 Value = x.Count()
             })
             .OrderByDescending(x=>x.Value)
-            .Skip(0).Take(10);
+            .Skip(0).Take(20);
 
         return await data.ToListAsync();
     }

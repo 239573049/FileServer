@@ -5,7 +5,6 @@ using File.Application.Contract.RouteMappings.Dto;
 using File.Application.Contract.RouteMappings.Input;
 using File.Application.Manage;
 using File.Entity;
-using File.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace File.Application.RouteMappings;

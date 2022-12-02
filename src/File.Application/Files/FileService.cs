@@ -4,12 +4,21 @@ using File.Application.Contract.Files.Dto;
 using File.Application.Contract.Files.Input;
 using System.IO.Compression;
 using System.Text;
+using File.Application.Contract.Eto;
 using File.Shared;
+using Token.Events;
 
 namespace File.Application.Files;
 
 public class FileService : IFileService
 {
+    private readonly ILoadEventBus<DeleteFileEto> _loadEventBus;
+
+    public FileService(ILoadEventBus<DeleteFileEto> loadEventBus)
+    {
+        _loadEventBus = loadEventBus;
+    }
+
     /// <inheritdoc />
     public Task<PagedResultDto<FilesListDto>> GetListAsync(GetListInput input)
     {
@@ -108,6 +117,8 @@ public class FileService : IFileService
     /// <inheritdoc />
     public async Task DeleteFileAsync(string path)
     {
+        await _loadEventBus.PushAsync(new DeleteFileEto(path));
+        
         System.IO.File.Delete(path);
         await Task.CompletedTask;
     }

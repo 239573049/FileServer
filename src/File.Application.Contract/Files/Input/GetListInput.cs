@@ -1,6 +1,4 @@
-﻿using File.Application.Contract.Base;
-
-namespace File.Application.Contract.Files.Input
+﻿namespace File.Application.Contract
 {
     public class GetListInput : PagedRequestInput
     {

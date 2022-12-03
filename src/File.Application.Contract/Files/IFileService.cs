@@ -1,9 +1,7 @@
-﻿using File.Application.Contract.Base;
-using File.Application.Contract.Files.Dto;
-using File.Application.Contract.Files.Input;
+﻿using File.Application.Contract.Files.Dto;
 using System.Threading.Tasks;
 
-namespace File.Application.Contract.Files
+namespace File.Application.Contract
 {
     public interface IFileService
     {

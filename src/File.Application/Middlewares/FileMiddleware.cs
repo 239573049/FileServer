@@ -1,12 +1,11 @@
-﻿using System.Collections.Concurrent;
-using File.Application.Contract.Base;
-using File.Application.Manage;
+﻿using File.Application.Contract;
 using File.Entity;
 using File.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Concurrent;
 
-namespace File.Application.Files;
+namespace File.Application;
 
 public class FileMiddleware : IMiddleware
 {

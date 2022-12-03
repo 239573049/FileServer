@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.Base;
+﻿namespace File.Application.Contract;
 
 public class HttpResultDto
 {

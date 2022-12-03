@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using File.Application.Contract.RouteMappings.Dto;
-using File.Application.Contract.RouteMappings.Input;
+﻿using File.Application.Contract.RouteMappings.Dto;
+using System.Threading.Tasks;
 
-namespace File.Application.Contract.RouteMappings;
+namespace File.Application.Contract;
 
 public interface IRouteMappingService
 {

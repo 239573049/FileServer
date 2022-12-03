@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace File.Application.Contract.Base
+namespace File.Application.Contract
 {
     public class PagedResultDto<T>
     {

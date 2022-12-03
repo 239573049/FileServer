@@ -1,4 +1,4 @@
-﻿namespace File.Application.Statistics;
+﻿namespace File.Application;
 
 public class StatisticsOptions
 {

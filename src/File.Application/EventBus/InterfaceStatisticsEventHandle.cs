@@ -3,7 +3,7 @@ using File.Entity;
 using Microsoft.Extensions.DependencyInjection;
 using Token.Handlers;
 
-namespace File.Application.EventBus;
+namespace File.Application;
 
 /// <summary>
 /// 浏览统计事件处理

@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.Statistics.Input;
+﻿namespace File.Application.Contract;
 
 public enum PieType
 {

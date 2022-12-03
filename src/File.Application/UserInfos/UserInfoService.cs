@@ -1,11 +1,8 @@
-﻿using File.Application.Contract.Base;
-using File.Application.Contract.UserInfos;
+﻿using File.Application.Contract;
 using File.Application.Contract.UserInfos.Dto;
-using File.Application.Contract.UserInfos.Input;
-using File.Application.Manage;
 using Microsoft.EntityFrameworkCore;
 
-namespace File.Application.UserInfos;
+namespace File.Application;
 
 public class UserInfoService : IUserInfoService
 {
@@ -47,7 +44,7 @@ public class UserInfoService : IUserInfoService
 
         if (userInfo == null)
         {
-            throw new BusinessException("账号获取错误",401);
+            throw new BusinessException("账号获取错误", 401);
         }
 
         return new UserInfoDto()

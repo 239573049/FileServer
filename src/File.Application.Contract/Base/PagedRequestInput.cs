@@ -1,4 +1,4 @@
-namespace File.Application.Contract.Base
+namespace File.Application.Contract
 {
     public class PagedRequestInput
     {
@@ -7,7 +7,7 @@ namespace File.Application.Contract.Base
         public int PageSize { get; set; }
 
         public int SkipCount => (Page - 1) * MaxResultCount;
-        
+
         public int MaxResultCount =>
             PageSize > 1000
                 ? 1000

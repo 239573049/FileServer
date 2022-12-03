@@ -1,15 +1,12 @@
-﻿using File.Application.Contract.Base;
-using File.Application.Contract.Files;
+﻿using File.Application.Contract;
+using File.Application.Contract.Eto;
 using File.Application.Contract.Files.Dto;
-using File.Application.Contract.Files.Input;
+using File.Shared;
 using System.IO.Compression;
 using System.Text;
-using File.Application.Contract.Eto;
-using File.Shared;
 using Token.Events;
-using File.Application.Migrations;
 
-namespace File.Application.Files;
+namespace File.Application;
 
 public class FileService : IFileService
 {
@@ -76,8 +73,8 @@ public class FileService : IFileService
             }
 
             using var str = new StreamReader(file);
-            return new FileContentDto(await str.ReadToEndAsync(),file.Name);
-            
+            return new FileContentDto(await str.ReadToEndAsync(), file.Name);
+
 
         }
         catch (Exception exception)
@@ -117,7 +114,7 @@ public class FileService : IFileService
         }
 
         await _loadEventBus.PushAsync(new DeleteFileEto(path));
-        
+
         System.IO.File.Delete(path);
         await Task.CompletedTask;
     }
@@ -129,7 +126,7 @@ public class FileService : IFileService
         {
             throw new BusinessException("目录名称不能为空");
         }
-        
+
         var fileName = Path.Combine(input.Path, input.Name);
         if (!Directory.Exists(input.Path))
         {
@@ -154,14 +151,14 @@ public class FileService : IFileService
     }
 
     /// <inheritdoc />
-    public async Task ExtractToDirectoryAsync(string path,string name)
+    public async Task ExtractToDirectoryAsync(string path, string name)
     {
         if (!Directory.Exists(path))
         {
             throw new BusinessException("文件夹不存在");
         }
 
-        ZipFile.ExtractToDirectory(Path.Combine(path,name), path);
+        ZipFile.ExtractToDirectory(Path.Combine(path, name), path);
 
         await Task.CompletedTask;
     }

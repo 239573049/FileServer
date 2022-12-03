@@ -1,4 +1,4 @@
-﻿using File.Application.Contract.Base;
+﻿using File.Application.Contract;
 using File.Shared;
 
 namespace File.Application;
@@ -11,7 +11,7 @@ public class FileHelper
         {
             return FileType.File;
         }
-        else if (System.IO.Directory.Exists(path))
+        else if (Directory.Exists(path))
         {
             return FileType.Directory;
         }

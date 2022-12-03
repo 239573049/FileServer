@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.UserInfos.Input;
+﻿namespace File.Application.Contract;
 
 public class AuthInput
 {

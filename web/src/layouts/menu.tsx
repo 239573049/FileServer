@@ -1,4 +1,4 @@
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import { HomeOutlined, UserOutlined, BarChartOutlined, PieChartOutlined, CloudServerOutlined } from '@ant-design/icons';
 
 const routes = {
   routes: [
@@ -11,18 +11,18 @@ const routes = {
           name: '首页',
           path: '/',
           component: '@/pages/home/index',
-          icon: <HomeOutlined />,
+          icon: <PieChartOutlined />,
         },
         {
           name: '文件管理',
           path: '/file',
-          icon: <UserOutlined />,
+          icon: <CloudServerOutlined />,
           component: '@/pages/file/index',
         },
         {
           name: '访问记录',
           path: '/visit',
-          icon: <UserOutlined />,
+          icon: <BarChartOutlined />,
           component: '@/pages/visit/index',
         }
       ],

@@ -1,29 +1,16 @@
-using File.Application.Contract.Base;
-using File.Application.Contract.Directorys;
-using File.Application.Contract.Files;
-using File.Application.Contract.Files.Input;
-using File.Application.Contract.Options;
-using File.Application.Contract.RouteMappings;
-using File.Application.Contract.RouteMappings.Input;
-using File.Application.Contract.UserInfos;
-using File.Application.Contract.UserInfos.Input;
-using File.Application.Extensions;
-using File.HttpApi.Host.Filters;
+using File.Application;
+using File.Application.Contract;
+using File.Application.Extensions; 
+using File.HttpApi.Host.Hubs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using File.Application.Contract.Statistics;
-using File.Application.Contract.Statistics.Input;
-using File.HttpApi.Host.Hubs;
-using Microsoft.AspNetCore.Mvc;
-
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddMvcCore(options => { options.Filters.Add<ResultFilter>(); });
 
 // ¿çÓò²ßÂÔ
 builder.Services.AddCors(options =>

@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.Files.Input;
+﻿namespace File.Application.Contract;
 
 public class SaveFileContentInput
 {

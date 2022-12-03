@@ -1,5 +1,5 @@
-﻿using System;
-using File.Shared;
+﻿using File.Shared;
+using System;
 
 namespace File.Application.Contract.Files.Dto
 {

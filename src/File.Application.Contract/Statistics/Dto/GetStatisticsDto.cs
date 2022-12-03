@@ -24,7 +24,7 @@ public class GetStatisticsDto
     /// <summary>
     /// 访问接口
     /// </summary>
-    public string Path { get; set; } 
+    public string Path { get; set; }
 
     /// <summary>
     /// 访问时间
@@ -39,7 +39,7 @@ public class GetStatisticsDto
     /// <summary>
     /// 访问携带的参数
     /// </summary>
-    public string Query { get; set; } 
+    public string Query { get; set; }
 
     public GetStatisticsDto(Guid id, int code, bool succeed, long responseTime, string path, DateTime createdTime, Guid? userId, string query)
     {

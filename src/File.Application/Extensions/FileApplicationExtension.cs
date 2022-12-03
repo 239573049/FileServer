@@ -1,15 +1,5 @@
-﻿using File.Application.Contract.Directorys;
-using File.Application.Contract.Files;
-using File.Application.Contract.Options;
-using File.Application.Contract.RouteMappings;
-using File.Application.Contract.UserInfos;
-using File.Application.Directorys;
-using File.Application.EventBus;
-using File.Application.Files;
-using File.Application.Manage;
-using File.Application.RouteMappings;
-using File.Application.Statistics;
-using File.Application.UserInfos;
+﻿using File.Application.Contract;
+using File.Application.Contract.Eto;
 using File.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -18,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
 using System.Text;
-using File.Application.Contract.Eto;
-using File.Application.Contract.Statistics;
 using Token.Extensions;
 using Token.Handlers;
 
@@ -29,12 +17,14 @@ public static class FileApplicationExtension
 {
     public static async void AddFileApplication(this IServiceCollection services, string connectString)
     {
+        services.AddMemoryCache();
         services.AddTransient<IFileService, FileService>();
         services.AddTransient<IDirectoryService, DirectoryService>();
         services.AddTransient<IRouteMappingService, RouteMappingService>();
         services.AddTransient<IUserInfoService, UserInfoService>();
         services.AddTransient<IStatisticsService, StatisticsService>();
         services.AddTransient<CurrentManage>();
+        services.AddTransient<CurrentLimitingMiddleware>();
 
         services.AddDbContext<FileDbContext>(options =>
         {
@@ -49,6 +39,8 @@ public static class FileApplicationExtension
             options.IgnoreUri.Add("/api/statistics/statistics");
             options.IgnoreUri.Add("/api/file/list");
             options.IgnoreUri.Add("/api/auth");
+            options.IgnoreUri.Add("/api/statistics/list");
+            options.IgnoreUri.Add("/uploading");
             return options;
         });
 
@@ -62,7 +54,7 @@ public static class FileApplicationExtension
             typeof(InterfaceStatisticsEventHandle));
         services.AddTransient(typeof(ILoadEventHandler<DeleteFileEto>),
             typeof(DeleteFileHandle));
-        
+
         services.AddTransient<InterfaceStatisticsMiddleware>();
     }
 
@@ -128,6 +120,7 @@ public static class FileApplicationExtension
     /// <param name="app"></param>
     public static void UseFileApplication(this IApplicationBuilder app)
     {
+        app.UseMiddleware<CurrentLimitingMiddleware>();
         app.UseMiddleware<InterfaceStatisticsMiddleware>();
         app.UseMiddleware<FileMiddleware>();
         app.UseAuthentication();

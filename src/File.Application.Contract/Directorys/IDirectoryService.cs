@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace File.Application.Contract.Directorys;
+namespace File.Application.Contract;
 
 public interface IDirectoryService
 {

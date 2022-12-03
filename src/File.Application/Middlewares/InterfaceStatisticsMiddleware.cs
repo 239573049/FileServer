@@ -1,11 +1,9 @@
 ﻿using File.Application.Contract.Eto;
-using File.Application.Manage;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
-using System.Text.Json;
 using Token.Events;
 
-namespace File.Application.Statistics;
+namespace File.Application;
 
 public class InterfaceStatisticsMiddleware : IMiddleware
 {
@@ -29,9 +27,13 @@ public class InterfaceStatisticsMiddleware : IMiddleware
         var sw = Stopwatch.StartNew();
         await next.Invoke(context);
         sw.Stop();
+        if (context.Response.StatusCode is 204 or 101)
+        {
+            return;
+        }
         var data = new InterfaceStatisticsEto()
         {
-            CreatedTime = DateTime.Now,
+            CreatedTime = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
             Path = context.Request.Path,
             Succeed = context.Response.StatusCode == 200,
             Code = context.Response.StatusCode,
@@ -40,7 +42,6 @@ public class InterfaceStatisticsMiddleware : IMiddleware
             UserId = _currentManage.UserId()
         };
         await _loadEventBus.PushAsync(data);
-        
-        Console.WriteLine(JsonSerializer.Serialize(data));
+
     }
 }

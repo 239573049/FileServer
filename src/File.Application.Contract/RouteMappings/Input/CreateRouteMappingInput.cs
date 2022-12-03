@@ -1,6 +1,6 @@
 ﻿using File.Shared;
 
-namespace File.Application.Contract.RouteMappings.Input;
+namespace File.Application.Contract;
 
 public class CreateRouteMappingInput
 {

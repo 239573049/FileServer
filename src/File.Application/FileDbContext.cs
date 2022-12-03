@@ -6,12 +6,12 @@ namespace File.Application;
 
 public class FileDbContext : DbContext
 {
-    public required  DbSet<UserInfo> UserInfos { get; set; }
+    public required DbSet<UserInfo> UserInfos { get; set; }
 
     public required DbSet<RouteMapping> RouteMappings { get; set; }
 
     public required DbSet<InterfaceStatistics> InterfaceStatistics { get; set; }
-    
+
     public FileDbContext(DbContextOptions options) : base(options)
     {
 
@@ -63,7 +63,7 @@ public class FileDbContext : DbContext
 
         });
 
-        var userInfo = new UserInfo("admin","Aa123456.","https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", RoleConstant.Admin);
+        var userInfo = new UserInfo("admin", "Aa123456.", "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", RoleConstant.Admin);
 
         builder.Entity<UserInfo>().HasData(userInfo);
     }

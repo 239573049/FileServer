@@ -1,10 +1,10 @@
-﻿using System.Collections.Concurrent;
-using System.Threading.Channels;
-using File.Application.Contract.Base;
-using File.HttpApi.Host.Module;
+﻿using File.HttpApi.Host.Module;
 using File.Shared;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Concurrent;
+using System.Threading.Channels;
+using File.Application.Contract;
 
 namespace File.HttpApi.Host.Hubs;
 
@@ -28,26 +28,52 @@ public class UploadingHub : Hub
         {
             Directory.CreateDirectory(filePath);
         }
+
+
         await using var fileStream =
             System.IO.File.Open(Path.Combine(filePath, fileName), FileMode.Create, FileAccess.Write);
+
         try
         {
+            var token = CancellationToken.None;
+            var state = false;
+
+            _ = Task.Factory.StartNew(async () =>
+            {
+                const int size = 2;
+                for (var i = 0; i < size; i++)
+                {
+                    state = false;
+                    // 等待5s如果没有做上传将取消上传操作
+                    await Task.Delay(5000, token);
+                    if (!state)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                    else
+                    {
+                        i = 0;
+                    }
+                }
+            }, token);
+
             var len = 0;
             var size = 80;
-            while (await stream.WaitToReadAsync())
+            while (await stream.WaitToReadAsync(token))
             {
                 while (stream.TryRead(out var item))
                 {
+                    state = true;
                     len += item.Length;
                     size--;
                     if (size == 0)
                     {
                         _ = Clients.Client(Context.ConnectionId).SendAsync("upload",
-                            new UploadModule(fileName, len, false, UploadState.BeingProcessed));
+                            new UploadModule(fileName, len, false, UploadState.BeingProcessed), token);
                         size = 80;
                     }
 
-                    await fileStream.WriteAsync(item);
+                    await fileStream.WriteAsync(item, token);
                 }
             }
         }

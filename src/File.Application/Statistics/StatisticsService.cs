@@ -1,10 +1,8 @@
-﻿using File.Application.Contract.Base;
-using File.Application.Contract.Statistics;
+﻿using File.Application.Contract;
 using File.Application.Contract.Statistics.Dto;
-using File.Application.Contract.Statistics.Input;
 using Microsoft.EntityFrameworkCore;
 
-namespace File.Application.Statistics;
+namespace File.Application;
 
 public class StatisticsService : IStatisticsService
 {
@@ -99,8 +97,8 @@ public class StatisticsService : IStatisticsService
             .OrderByDescending(x => x.CreatedTime);
 
         var data = await query
-            .Skip(input.PageSize * (input.Page - 1))
-            .Take(input.PageSize)
+            .Skip(input.SkipCount)
+            .Take(input.MaxResultCount)
             .ToListAsync();
 
         var count = await query.CountAsync();

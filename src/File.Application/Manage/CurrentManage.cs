@@ -1,13 +1,13 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 using System.Text.Json;
-using File.Application.Contract.Base;
-using Microsoft.AspNetCore.Http;
+using File.Application.Contract;
 
-namespace File.Application.Manage;
+namespace File.Application;
 
 public class CurrentManage
 {
-    
+
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CurrentManage(IHttpContextAccessor httpContextAccessor)

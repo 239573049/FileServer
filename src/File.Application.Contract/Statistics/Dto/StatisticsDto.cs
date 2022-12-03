@@ -16,7 +16,7 @@ public class StatisticsDto
     /// 上星期访问量
     /// </summary>
     public int LastWeek { get; set; }
-    
+
     /// <summary>
     /// 总访问量
     /// </summary>

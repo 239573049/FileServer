@@ -20,7 +20,7 @@ public class UploadModule
     /// 状态
     /// </summary>
     public UploadState state { get; set; }
-    
+
     /// <summary>
     /// 如果发生异常传输异常信息
     /// </summary>

@@ -3,7 +3,7 @@
     public class UserInfo
     {
         public Guid Id { get; set; }
-        
+
         /// <summary>
         /// 用户名
         /// </summary>
@@ -17,7 +17,7 @@
         /// <summary>
         /// 头像
         /// </summary>
-        public string Avatar  { get; set; }
+        public string Avatar { get; set; }
 
         /// <summary>
         /// 角色
@@ -26,7 +26,7 @@
 
         public UserInfo(string username, string password, string avatar, string role)
         {
-            Id=Guid.NewGuid();
+            Id = Guid.NewGuid();
             Username = username;
             Password = password;
             Avatar = avatar;

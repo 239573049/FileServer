@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using File.Application.Contract.UserInfos.Dto;
-using File.Application.Contract.UserInfos.Input;
+﻿using File.Application.Contract.UserInfos.Dto;
+using System.Threading.Tasks;
 
-namespace File.Application.Contract.UserInfos;
+namespace File.Application.Contract;
 
 public interface IUserInfoService
 {

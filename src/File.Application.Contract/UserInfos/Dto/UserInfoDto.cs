@@ -5,7 +5,7 @@ namespace File.Application.Contract.UserInfos.Dto;
 public class UserInfoDto
 {
     public Guid Id { get; set; }
-        
+
     /// <summary>
     /// 用户名
     /// </summary>
@@ -19,5 +19,5 @@ public class UserInfoDto
     /// <summary>
     /// 头像
     /// </summary>
-    public string Avatar  { get; set; }
+    public string Avatar { get; set; }
 }

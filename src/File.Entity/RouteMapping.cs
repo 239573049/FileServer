@@ -5,7 +5,7 @@ namespace File.Entity;
 public class RouteMapping
 {
     public Guid Id { get; set; }
-    
+
     /// <summary>
     /// 路由
     /// </summary>
@@ -20,7 +20,7 @@ public class RouteMapping
     /// 类型
     /// </summary>
     public FileType Type { get; set; }
-    
+
     /// <summary>
     /// 创建人
     /// </summary>
@@ -35,9 +35,9 @@ public class RouteMapping
 
     protected RouteMapping()
     {
-        
+
     }
-    
+
     public RouteMapping(string route, string path, FileType type, string? password, Guid createUserInfoId)
     {
         Route = route;

@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.Options;
+﻿namespace File.Application.Contract;
 
 public class TokenOptions
 {

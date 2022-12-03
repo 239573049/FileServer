@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using File.Application.Contract.Statistics.Dto;
+﻿using File.Application.Contract.Statistics.Dto;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using File.Application.Contract.Base;
-using File.Application.Contract.Statistics.Input;
 
-namespace File.Application.Contract.Statistics;
+namespace File.Application.Contract;
 
 public interface IStatisticsService
 {

@@ -4,5 +4,5 @@ export interface CreateRouteMappingInput {
     route: string;
     path: string;
     type: FileType;
-    visitor: boolean;
+    password: string;
 }

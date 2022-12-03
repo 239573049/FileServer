@@ -1,4 +1,4 @@
-﻿namespace File.Application.Contract.Files.Input;
+﻿namespace File.Application.Contract;
 public class CreateFileInput
 {
     public string Path { get; set; }

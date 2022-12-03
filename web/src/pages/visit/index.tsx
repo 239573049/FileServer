@@ -2,7 +2,7 @@ import statisticsApi from "@/apis/statisticsApi";
 import { GetStatisticsDto } from "@/module/dto/getStatisticsDto";
 import { GetStatisticsInput } from "@/module/input/getStatisticsInput";
 import { PagedResultDto } from "@/module/pagedResultDto";
-import { Table, Input } from 'antd';
+import { Table, Input, Tag, Pagination } from 'antd';
 import { Component, ReactNode } from "react";
 
 var { Search } = Input
@@ -25,12 +25,14 @@ const columns = [
     {
         title: '状态码',
         dataIndex: 'code',
-        key: 'code',
+        key: 'code'
     },
     {
         title: '是否访问成功',
         dataIndex: 'succeed',
         key: 'succeed',
+        render: (value: boolean) => value ? <Tag color="magenta">成功</Tag> : <Tag color="magenta">失败</Tag>
+
     },
     {
         title: '访问路由',
@@ -70,12 +72,9 @@ class Visit extends Component<IProps, IState> {
 
     getList() {
         var { input, data } = this.state;
-
         statisticsApi.getList(input)
             .then(res => {
                 data = res;
-                console.log(data);
-
                 this.setState({
                     data
                 })
@@ -90,8 +89,16 @@ class Visit extends Component<IProps, IState> {
                     this.setState({ input })
                 }} enterButton />
             </div>
-            <div>
-                <Table dataSource={data.items} columns={columns} />
+            <div >
+                <Table scroll={{ x: 1500, y: 900 }} pagination={false} dataSource={data.items} columns={columns} />
+                <Pagination defaultCurrent={input.page} total={data.totalCount} onChange={(page, pageSize) => {
+                    input.page = page;
+                    input.pageSize = pageSize;
+                    this.setState({
+                        input
+                    })
+                    this.getList()
+                }} />
             </div>
         </div>)
     }

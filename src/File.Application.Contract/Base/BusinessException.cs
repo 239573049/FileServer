@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace File.Application.Contract.Base;
+namespace File.Application.Contract;
 
 public class BusinessException : Exception
 {

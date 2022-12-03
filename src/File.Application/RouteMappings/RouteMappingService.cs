@@ -1,17 +1,14 @@
-﻿using System.Collections.Concurrent;
-using File.Application.Contract.Base;
-using File.Application.Contract.RouteMappings;
+﻿using File.Application.Contract;
 using File.Application.Contract.RouteMappings.Dto;
-using File.Application.Contract.RouteMappings.Input;
-using File.Application.Manage;
 using File.Entity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
-namespace File.Application.RouteMappings;
+namespace File.Application;
 
 public class RouteMappingService : IRouteMappingService
 {
-    private readonly ConcurrentDictionary<string,RouteMapping> _routeMappings;
+    private readonly ConcurrentDictionary<string, RouteMapping> _routeMappings;
     private readonly FileDbContext _fileDbContext;
     private readonly CurrentManage _currentManage;
 
@@ -34,8 +31,8 @@ public class RouteMappingService : IRouteMappingService
         {
             throw new BusinessException("路径错误，不存在当前文件或者目录");
         }
-        
-        var routeMapping = new RouteMapping(input.Route, input.Path, FileHelper.GetFileType(input.Path), input.Password,_currentManage.GetUserId());
+
+        var routeMapping = new RouteMapping(input.Route, input.Path, FileHelper.GetFileType(input.Path), input.Password, _currentManage.GetUserId());
 
         await _fileDbContext.RouteMappings.AddAsync(routeMapping);
 
@@ -59,7 +56,7 @@ public class RouteMappingService : IRouteMappingService
         await _fileDbContext.SaveChangesAsync();
 
         // 保存成功以后删除缓存
-        _routeMappings.Remove(data.Route,out _);
+        _routeMappings.Remove(data.Route, out _);
     }
 
     /// <inheritdoc />
@@ -82,5 +79,5 @@ public class RouteMappingService : IRouteMappingService
             Password = data.Password
         };
     }
-    
+
 }

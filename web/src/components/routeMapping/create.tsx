@@ -2,7 +2,7 @@ import { Component, ReactNode } from "react";
 import { Modal, Input, message, Radio } from 'antd';
 import { FilesListDto, FileType } from "@/module/filesListDto";
 import routeMappingApi from "@/apis/routeMappingApi";
-
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 class CreateRouteMapping extends Component {
 
@@ -12,7 +12,7 @@ class CreateRouteMapping extends Component {
             route: '',
             path: "",
             type: FileType.File,
-            visitor: false,
+            password: '',
         },
         show: false
     }
@@ -35,7 +35,7 @@ class CreateRouteMapping extends Component {
                         if (res.path !== "") {
                             input.route = res.route;
                             input.type = res.type;
-                            input.visitor = res.visitor;
+                            input.password = res.password;
                             this.setState({
                                 input
                             })
@@ -51,6 +51,7 @@ class CreateRouteMapping extends Component {
             message.error("路由开头必须使用“/”")
             return
         }
+
         routeMappingApi.create(this.state.input)
             .then(res => {
                 if (res != undefined) {
@@ -70,22 +71,20 @@ class CreateRouteMapping extends Component {
         var { input, show } = this.state
         return (
             <Modal title="新建路由映射配置" open={show} onOk={() => this.handleOk()} onCancel={() => this.handleCancel()} >
-                <Input value={input.route} onChange={(e) => {
+                访问路由：<Input value={input.route} onChange={(e) => {
                     input.route = e.target.value
                     this.setState({
                         input
                     })
                 }} placeholder="请输入路由地址;示例“/r/s”" />
-
-                <Radio.Group onChange={(e) => {
-                    input.visitor = e.target.value
-                    this.setState({
-                        input
-                    })
-                }} value={input.visitor}>
-                    <Radio value={true}>允许游客访问</Radio>
-                    <Radio value={false}>不允许游客访问</Radio>
-                </Radio.Group>
+                访问密码： <Input.Password value={input.password}
+                    iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                    onChange={(e) => {
+                        input.password = e.target.value
+                        this.setState({
+                            input
+                        })
+                    }} placeholder="服务密码为空则不设置" />
             </Modal>)
     }
 }

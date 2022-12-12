@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace File.Application.Migrations
 {
     [DbContext(typeof(FileDbContext))]
-    [Migration("20221129171455_init")]
-    partial class init
+    [Migration("20221203153721_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +27,8 @@ namespace File.Application.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Code")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("INTEGER")
+                        .HasComment("响应状态码");
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("TEXT")
@@ -54,6 +55,8 @@ namespace File.Application.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedTime");
+
                     b.HasIndex("Id")
                         .IsUnique();
 
@@ -72,6 +75,10 @@ namespace File.Application.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("创建人");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("TEXT")
+                        .HasComment("访问密码");
+
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("TEXT")
@@ -85,10 +92,6 @@ namespace File.Application.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER")
                         .HasComment("地址类型");
-
-                    b.Property<bool>("Visitor")
-                        .HasColumnType("INTEGER")
-                        .HasComment("是否同意他人访问");
 
                     b.HasKey("Id");
 
@@ -116,6 +119,10 @@ namespace File.Application.Migrations
                         .HasColumnType("TEXT")
                         .HasComment("密码");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("TEXT")
@@ -134,9 +141,10 @@ namespace File.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d307357e-adf0-4be7-9c5c-f3751c231db1"),
+                            Id = new Guid("f2248b6c-588c-40fa-b94f-3fe6cad91960"),
                             Avatar = "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png",
                             Password = "Aa123456.",
+                            Role = "admin",
                             Username = "admin"
                         });
                 });

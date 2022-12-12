@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace File.Application.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +26,7 @@ namespace File.Application.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Code = table.Column<int>(type: "INTEGER", nullable: false),
+                    Code = table.Column<int>(type: "INTEGER", nullable: false, comment: "响应状态码"),
                     Succeed = table.Column<bool>(type: "INTEGER", nullable: false),
                     ResponseTime = table.Column<long>(type: "INTEGER", nullable: false),
                     Path = table.Column<string>(type: "TEXT", nullable: false),
@@ -46,7 +47,8 @@ namespace File.Application.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Username = table.Column<string>(type: "TEXT", nullable: false, comment: "用户名（唯一）"),
                     Password = table.Column<string>(type: "TEXT", nullable: false, comment: "密码"),
-                    Avatar = table.Column<string>(type: "TEXT", nullable: false, comment: "头像")
+                    Avatar = table.Column<string>(type: "TEXT", nullable: false, comment: "头像"),
+                    Role = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,8 +64,8 @@ namespace File.Application.Migrations
                     Route = table.Column<string>(type: "TEXT", nullable: false, comment: "路由"),
                     Path = table.Column<string>(type: "TEXT", nullable: false, comment: "绝对路径"),
                     Type = table.Column<int>(type: "INTEGER", nullable: false, comment: "地址类型"),
-                    Visitor = table.Column<bool>(type: "INTEGER", nullable: false, comment: "是否同意他人访问"),
-                    CreateUserInfoId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "创建人")
+                    CreateUserInfoId = table.Column<Guid>(type: "TEXT", nullable: false, comment: "创建人"),
+                    Password = table.Column<string>(type: "TEXT", nullable: true, comment: "访问密码")
                 },
                 constraints: table =>
                 {
@@ -80,8 +82,14 @@ namespace File.Application.Migrations
             migrationBuilder.InsertData(
                 schema: "用户",
                 table: "UserInfos",
-                columns: new[] { "Id", "Avatar", "Password", "Username" },
-                values: new object[] { new Guid("d307357e-adf0-4be7-9c5c-f3751c231db1"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin" });
+                columns: new[] { "Id", "Avatar", "Password", "Role", "Username" },
+                values: new object[] { new Guid("f2248b6c-588c-40fa-b94f-3fe6cad91960"), "https://blog-simple.oss-cn-shenzhen.aliyuncs.com/logo.png", "Aa123456.", "admin", "admin" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterfaceStatistics_CreatedTime",
+                schema: "接口访问统计",
+                table: "InterfaceStatistics",
+                column: "CreatedTime");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InterfaceStatistics_Id",
